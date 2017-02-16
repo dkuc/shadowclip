@@ -1,0 +1,96 @@
+﻿<UserControl x:Class="ShadowClip.GUI.VideoView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:cal="http://www.caliburnproject.org"
+             xmlns:gui="clr-namespace:ShadowClip.GUI"
+             mc:Ignorable="d"
+             d:DesignHeight="300" d:DesignWidth="300">
+    <UserControl.Resources>
+        <gui:MaxLengthConverter x:Key="MaxLength" />
+        <gui:PlayActionCoverter x:Key="PlayActionCoverter" />
+        <gui:IntegerSecondsConverter x:Key="IntegerSecondsConverter" />
+    </UserControl.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <MediaElement Name="Video"
+                      MinWidth="300"
+                      ScrubbingEnabled="True"
+                      LoadedBehavior="Manual"
+                      cal:Message.Attach="[Event MouseUp] = [Action VideoClicked()]" HorizontalAlignment="Center"
+                      VerticalAlignment="Bottom" />
+        <Grid Grid.Row="1">
+            <StackPanel>
+                <Grid Width="{Binding ElementName=Video, Path=ActualWidth}" HorizontalAlignment="Center">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="auto" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="auto" />
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition />
+                        <RowDefinition />
+                        <RowDefinition />
+                    </Grid.RowDefinitions>
+                    <Button Content="{Binding CurrentMediaState, Converter={StaticResource PlayActionCoverter}}"
+                            Name="TogglePlay" MinWidth="40" />
+                    <Slider Grid.Row="0" Grid.Column="1" Name="VideoSlider"
+                            cal:Message.Attach="[Event PreviewKeyDown] = [Action KeyPressed($eventArgs)];
+                            [Event PreviewMouseDown] = [Action SliderClicked()];
+                            [Event PreviewMouseUp] = [Action SliderReleased()]"
+                            Maximum="{Binding Duration, Converter={StaticResource MaxLength}}"
+                            Value="{Binding CurrentPosition}" HorizontalAlignment="Stretch"
+                            IsMoveToPointEnabled="True" />
+
+                    <StackPanel Grid.Row="0" Grid.Column="2" Orientation="Horizontal" HorizontalAlignment="Center">
+
+
+                        <CheckBox Content="Muted" IsChecked="{Binding VideoPlayer.IsMuted}" />
+                        <TextBlock Text="{Binding Position, StringFormat=mm\\:ss}" />
+                        <TextBlock Text=" / " />
+                        <TextBlock Text="{Binding Duration, StringFormat=mm\\:ss}" />
+
+
+                    </StackPanel>
+                    <Slider Grid.Row="1" Grid.Column="1" Name="StartSlider"
+                            TickPlacement="BottomRight"
+                            TickFrequency="1" Minimum="0"
+                            Maximum="{Binding Duration, Converter={StaticResource MaxLength}}"
+                            IsSnapToTickEnabled="True"
+                            Value="{Binding StartPostion}"
+                            IsMoveToPointEnabled="True" />
+                    <StackPanel Grid.Row="1" Grid.Column="2" Orientation="Horizontal" HorizontalAlignment="Right">
+                        <TextBlock Text="Start: " />
+                        <TextBlock HorizontalAlignment="Right"
+                                   Text="{Binding ElementName=StartSlider, Path=Value, Converter={StaticResource IntegerSecondsConverter}}"
+                                   MinWidth="30" />
+                    </StackPanel>
+
+
+                    <Slider Grid.Row="2" Grid.Column="1" Name="EndSlider"
+                            TickPlacement="BottomRight"
+                            TickFrequency="1" Minimum="0"
+                            Maximum="{Binding Duration, Converter={StaticResource MaxLength}}"
+                            IsSnapToTickEnabled="True"
+                            Value="{Binding EndPostion}" HorizontalAlignment="Stretch"
+                            IsMoveToPointEnabled="True" />
+                    <StackPanel Grid.Row="2" Grid.Column="2" Orientation="Horizontal" HorizontalAlignment="Right">
+                        <TextBlock Text="End: " />
+                        <TextBlock HorizontalAlignment="Right"
+                                   Text="{Binding ElementName=EndSlider, Path=Value, Converter={StaticResource IntegerSecondsConverter}}"
+                                   MinWidth="30" />
+                    </StackPanel>
+
+                </Grid>
+                <Button Content="Upload" Name="Upload" />
+            </StackPanel>
+
+
+        </Grid>
+
+    </Grid>
+</UserControl>

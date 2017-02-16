@@ -1,0 +1,79 @@
+﻿<UserControl x:Class="ShadowClip.GUI.UploadDialog.UploadClipView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+
+             xmlns:gui="clr-namespace:ShadowClip.GUI"
+             xmlns:cal="http://www.caliburnproject.org"
+             mc:Ignorable="d"
+             d:DesignWidth="300">
+    <UserControl.Resources>
+        <gui:StateToBoolConverter x:Key="StateToBoolConverter" />
+        <gui:BitRateConverter x:Key="BitRateConverter" />
+    </UserControl.Resources>
+    <Grid>
+        <StackPanel>
+            <TextBlock Text="{Binding OriginalFile.Name}" />
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Text="{Binding StartTime, StringFormat=Start: {0}s  }" Margin="20,0" />
+                <TextBlock Text="{Binding EndTime, StringFormat=End: {0}s  }" />
+            </StackPanel>
+
+
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Text="File Name:" />
+                <TextBox Text="{Binding FileName, UpdateSourceTrigger=PropertyChanged}" MinWidth="200" MaxLength="30"
+                         IsEnabled="{Binding CurrentState,Converter={StaticResource StateToBoolConverter},ConverterParameter='ready,error'}" />
+            </StackPanel>
+
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                <Button Name="StartUpload" Content="Clip And Upload"
+                        IsEnabled="{Binding CurrentState,Converter={StaticResource StateToBoolConverter},ConverterParameter='ready,error'}" />
+                <Button Name="Cancel" Content="Cancel"
+                        IsEnabled="{Binding CurrentState,Converter={StaticResource StateToBoolConverter}, ConverterParameter=working}" />
+            </StackPanel>
+
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+                <TextBlock Text="Encoding:" />
+                <ProgressBar Name="EncodeProcess" Grid.Row="0" Grid.Column="1" Height="15"
+                             Value="{Binding EncodeProgress}" />
+                <TextBlock Grid.Row="0" Grid.Column="2"
+                           Text="{Binding EncodeFps, StringFormat=' {0} FPS'}" />
+                <TextBlock Grid.Row="1" Grid.Column="0" Text="Upload:" />
+                <ProgressBar Grid.Row="1" Grid.Column="1" Height="15" Value="{Binding UploadProgress}" />
+                <TextBlock Grid.Row="1" Grid.Column="2"
+                           Text="{Binding UploadRate, Converter={StaticResource BitRateConverter}}" />
+            </Grid>
+            <TextBlock Text="{Binding CurrentState, StringFormat=State: {0}}" />
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Text="Url: " />
+                <TextBlock cal:Message.Attach="[Event PreviewMouseUp] = [Action OnUrlClick($eventArgs)]">
+                    <Hyperlink>
+                        <Hyperlink.ContextMenu>
+                            <ContextMenu>
+                                <MenuItem Header="Copy" cal:Message.Attach="Copy()" />
+                            </ContextMenu>
+                        </Hyperlink.ContextMenu>
+                        <TextBlock Text="{Binding Url}" />
+                    </Hyperlink>
+                </TextBlock>
+                <Button Name="Copy" Content="Copy To Clipboard" />
+
+            </StackPanel>
+            <CheckBox IsChecked="{Binding DeleteOnSuccess}" Content="Delete Original File On Success"
+                      IsEnabled="{Binding CurrentState,Converter={StaticResource StateToBoolConverter},ConverterParameter='ready,working,error'}" />
+
+            <TextBlock Text="{Binding ErrorText}" Foreground="Red" MaxWidth="300" TextWrapping="Wrap" />
+        </StackPanel>
+    </Grid>
+</UserControl>
