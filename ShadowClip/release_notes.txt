@@ -1,1 +1,2 @@
-﻿*Added Release Notes
+﻿* Fixed encoding progress not reaching 100%
+*Added Release Notes

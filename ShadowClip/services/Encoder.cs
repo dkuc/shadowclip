@@ -53,7 +53,7 @@ namespace ShadowClip.services
                 }
             };
 
-            instance.EncodeProgress += (o, args) => NewMeth(args, encodeProgresss);
+            instance.EncodeProgress += (o, args) => OnProgress(args, encodeProgresss);
 
             instance.EncodeCompleted += (o, args) =>
             {
@@ -65,6 +65,7 @@ namespace ShadowClip.services
                             throw new Exception("Encoding was canceled");
                         throw new Exception("Encoding failed. I don't know why 'cause this API kinda sucks");
                     }
+                    encodeProgresss.Report(new EncodeProgress(100, 0));
                     taskCompletionSource.TrySetResult(true);
                 }
                 catch (Exception e)
@@ -78,7 +79,7 @@ namespace ShadowClip.services
             return taskCompletionSource.Task;
         }
 
-        private void NewMeth(EncodeProgressEventArgs args, IProgress<EncodeProgress> encodeProgresss)
+        private void OnProgress(EncodeProgressEventArgs args, IProgress<EncodeProgress> encodeProgresss)
         {
             encodeProgresss.Report(new EncodeProgress((int) (args.FractionComplete * 100), (int) args.AverageFrameRate));
         }
