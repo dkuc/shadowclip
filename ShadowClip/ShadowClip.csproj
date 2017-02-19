@@ -29,7 +29,7 @@
     <PublisherName>Dans PC</PublisherName>
     <CreateWebPageOnPublish>true</CreateWebPageOnPublish>
     <WebPage>publish.htm</WebPage>
-    <ApplicationRevision>6</ApplicationRevision>
+    <ApplicationRevision>7</ApplicationRevision>
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <PublishWizardCompleted>true</PublishWizardCompleted>
@@ -121,6 +121,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="GUI\UpdateViewModel.cs" />
     <Compile Include="GUI\Converters.cs" />
     <Compile Include="GUI\Events.cs" />
     <Compile Include="GUI\ExtensionMethods.cs" />
@@ -170,6 +171,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="GUI\UpdateView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="GUI\UploadDialog\UploadClipView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -193,6 +198,7 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
+    <None Include="scripts\after_publish.bat" />
     <None Include="ShadowClip_TemporaryKey.pfx" />
     <Resource Include="Shaunkleyn-Phlat-Blue-Folders-Movies.ico" />
     <EmbeddedResource Include="Properties\Resources.resx">
@@ -234,6 +240,9 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="release_notes.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <None Include="dependencies\HandBrake.ApplicationServices.dll" />
     <Content Include="hb.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -332,4 +341,7 @@
     </PublishFile>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Target Name="CustomPostPublishActions" AfterTargets="PublishOnly">
+    <Exec MSBuildArchitecture="x64" Command="scripts\after_publish.bat $(Configuration) $(Platform)" />
+  </Target>
 </Project>
