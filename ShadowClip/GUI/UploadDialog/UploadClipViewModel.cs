@@ -32,7 +32,7 @@ namespace ShadowClip.GUI.UploadDialog
         Done
     }
 
-    public class UploadClipViewModel : Screen
+    public sealed class UploadClipViewModel : Screen
     {
         private readonly IClipCreator _clipCreator;
         private CancellationTokenSource _cancelToken;
@@ -44,12 +44,7 @@ namespace ShadowClip.GUI.UploadDialog
             StartTime = data.StartTime;
             EndTime = data.EndTime;
             FileName = "";
-        }
-
-        public override string DisplayName
-        {
-            get { return "Uploader"; }
-            set { }
+            DisplayName = "Uploader";
         }
 
         public State CurrentState { get; set; }
@@ -78,7 +73,7 @@ namespace ShadowClip.GUI.UploadDialog
 
         public string ErrorText { get; set; }
 
-        public string Url => $"https://dankuc.com/uploads/{Uri.EscapeUriString(SafeFileName)}.mp4";
+        public string Url => $"https://dankuc.com/videos/{Uri.EscapeUriString(SafeFileName)}";
 
 
         public async void StartUpload()
