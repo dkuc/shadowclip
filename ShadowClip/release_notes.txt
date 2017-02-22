@@ -1,3 +1,6 @@
-﻿* Links to a new webplayer - video.js.  Has frame-by-frame buttons.
+﻿* Better streaming encoder settings. Should make frame-by-frame better.
+* Added screenshot button
+* Moved muted check box
+* Links to a new webplayer - video.js.  Has frame-by-frame buttons.
 * Fixed encoding progress not reaching 100%
 *Added Release Notes

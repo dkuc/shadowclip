@@ -168,5 +168,12 @@ namespace ShadowClip.GUI
             if (_playingWhileClicked)
                 VideoPlayer.Play();
         }
+
+        public void Screenshot()
+        {
+            var screenShot = VideoPlayer.GetScreenShot();
+
+            Clipboard.SetImage(screenShot);
+        }
     }
 }

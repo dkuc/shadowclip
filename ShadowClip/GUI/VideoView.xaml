@@ -48,11 +48,10 @@
 
                     <StackPanel Grid.Row="0" Grid.Column="2" Orientation="Horizontal" HorizontalAlignment="Center">
 
-
-                        <CheckBox Content="Muted" IsChecked="{Binding VideoPlayer.IsMuted}" />
                         <TextBlock Text="{Binding Position, StringFormat=mm\\:ss}" />
                         <TextBlock Text=" / " />
                         <TextBlock Text="{Binding Duration, StringFormat=mm\\:ss}" />
+                        <CheckBox Content="Muted" IsChecked="{Binding VideoPlayer.IsMuted}" />
 
 
                     </StackPanel>
@@ -86,7 +85,10 @@
                     </StackPanel>
 
                 </Grid>
-                <Button Content="Upload" Name="Upload" />
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                    <Button Content="Upload Clip" Name="Upload" />
+                    <Button Content="Copy Screenshot" Name="Screenshot" />
+                </StackPanel>
             </StackPanel>
 
 
