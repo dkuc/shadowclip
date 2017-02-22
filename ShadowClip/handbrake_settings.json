@@ -11,16 +11,6 @@
         "Samplerate": 0,
         "Track": 0,
         "DitherMethod": 0
-      },
-      {
-        "DRC": 0.0,
-        "Encoder": 1073743872,
-        "Gain": 0.0,
-        "Mixdown": -1,
-        "NormalizeMixLevel": false,
-        "Samplerate": 0,
-        "Track": 0,
-        "DitherMethod": 0
       }
     ],
     "CopyMask": [
@@ -45,7 +35,7 @@
     "File": "",
     "Mp4Options": {
       "IpodAtom": false,
-      "Mp4Optimize": false
+      "Mp4Optimize": true
     },
     "Mux": 131072
   },
@@ -107,23 +97,23 @@
   },
   "Subtitle": {
     "Search": {
-      "Burn": false,
+      "Burn": true,
       "Default": false,
-      "Enable": false,
-      "Forced": false
+      "Enable": true,
+      "Forced": true
     },
     "SubtitleList": []
   },
   "Video": {
     "Encoder": 65536,
-    "Level": "4.1",
+    "Level": "4.0",
     "TwoPass": false,
     "Turbo": false,
     "ColorMatrixCode": 0,
     "Options": "",
     "Preset": "medium",
-    "Profile": "high",
-    "Quality": 20.0,
+    "Profile": "main",
+    "Quality": 22.0,
     "OpenCL": false,
     "HWDecode": false,
     "QSV": {
