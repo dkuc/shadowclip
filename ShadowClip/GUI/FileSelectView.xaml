@@ -16,7 +16,19 @@
             <TextBlock Text="{Binding Path}" />
             <Button Name="Browse" Content="Browse" />
         </StackPanel>
-        <ListBox Grid.Row="1" Name="Files" DisplayMemberPath="Name" />
+        <ListBox Grid.Row="1" Name="Files" VirtualizingPanel.VirtualizationMode="Recycling"
+                 VirtualizingPanel.CacheLengthUnit="Page"
+                 VirtualizingPanel.CacheLength="2,2">
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <StackPanel Orientation="Horizontal">
+                        <MediaElement LoadedBehavior="Pause" ScrubbingEnabled="True" Source="{Binding FullName}"
+                                      IsMuted="True" Height="100" MinWidth="133" />
+                        <TextBlock Padding="5,0,5,0" Text="{Binding CreationTime}" />
+                    </StackPanel>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
         <TextBlock Grid.Row="1" Text="{Binding ErrorMessage}" VerticalAlignment="Center" HorizontalAlignment="Center" />
 
     </Grid>
