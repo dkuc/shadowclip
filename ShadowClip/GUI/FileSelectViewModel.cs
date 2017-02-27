@@ -1,7 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
+using System.Windows.Data;
 using System.Windows.Forms;
 using Caliburn.Micro;
 using Screen = Caliburn.Micro.Screen;
@@ -11,6 +12,7 @@ namespace ShadowClip.GUI
     public sealed class FileSelectViewModel : Screen, IHandle<WindowClosing>
     {
         private readonly IEventAggregator _eventAggregator;
+        private readonly BindableCollection<FileInfo> _files = new BindableCollection<FileInfo>();
         private readonly ISettings _settings;
         private readonly FileSystemWatcher _watcher = new FileSystemWatcher();
 
@@ -21,9 +23,13 @@ namespace ShadowClip.GUI
             PropertyChanged += PropertyUpdated;
             Path = _settings.ShadowplayPath;
             eventAggregator.Subscribe(this);
+            Files = CollectionViewSource.GetDefaultView(_files);
+            Files.SortDescriptions.Add(new SortDescription("CreationTime", ListSortDirection.Descending));
         }
 
-        public IEnumerable<FileInfo> Files { get; set; }
+
+        public ICollectionView Files { get; }
+
 
         public FileInfo SelectedFile { get; set; }
 
@@ -53,7 +59,17 @@ namespace ShadowClip.GUI
             ErrorMessage = "";
             try
             {
-                Files = new DirectoryInfo(Path).GetFiles().OrderByDescending(info => info.CreationTime);
+                var filesOnDisk = new DirectoryInfo(Path).GetFiles();
+                var newFiles =
+                    filesOnDisk.Where(info => _files.All(fileInfo => fileInfo.FullName != info.FullName)).ToList();
+                var deletedFiles =
+                    _files.Where(info => filesOnDisk.All(fileInfo => info.FullName != fileInfo.FullName)).ToList();
+                //Gotta add/delete one by one to stop the entire list from re-rendering
+                foreach (var deletedFile in deletedFiles)
+                    _files.Remove(deletedFile);
+                foreach (var addedFile in newFiles)
+                    _files.Add(addedFile);
+
                 _watcher.Path = Path;
                 _watcher.EnableRaisingEvents = true;
             }
@@ -79,6 +95,24 @@ namespace ShadowClip.GUI
             {
                 Path = folderBrowserDialog.SelectedPath;
                 LoadPath();
+            }
+        }
+
+        public void Delete(FileInfo file)
+        {
+            try
+            {
+                var dialogResult = MessageBox.Show("Are you sure you want to delete this?", "Delete File",
+                    MessageBoxButtons.OKCancel);
+                if (dialogResult == DialogResult.OK)
+                {
+                    file.Delete();
+                    _files.Remove(file);
+                }
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show("It didn't work: " + e.Message);
             }
         }
     }
