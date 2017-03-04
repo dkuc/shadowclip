@@ -50,11 +50,11 @@ namespace ShadowClip.GUI
         }
     }
 
-    internal class IntegerSecondsConverter : SimpleConverter<double>
+    internal class IntegerSecondsConverter : SimpleConverter<TimeSpan>
     {
-        public override object Convert(double time)
+        public override object Convert(TimeSpan time)
         {
-            return TimeSpan.FromSeconds(time).ToString("m\\:ss");
+            return time.ToString("m\\:ss\\.ff");
         }
     }
 

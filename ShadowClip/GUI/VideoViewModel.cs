@@ -38,9 +38,9 @@ namespace ShadowClip.GUI
         public TimeSpan Duration
             => VideoPlayer.NaturalDuration.HasTimeSpan ? VideoPlayer.NaturalDuration.TimeSpan : TimeSpan.Zero;
 
-        public double StartPosition { get; set; }
+        public TimeSpan StartPosition { get; set; }
 
-        public double EndPosition { get; set; }
+        public TimeSpan EndPosition { get; set; }
 
         public double CurrentPosition
         {
@@ -49,7 +49,7 @@ namespace ShadowClip.GUI
             set
             {
                 VideoPlayer.Pause();
-                VideoPlayer.Position = TimeSpan.FromSeconds(value);
+                VideoPlayer.Position = TimeSpan.FromTicks((long) (value * 10_000_000));
                 NotifyOfPropertyChange(() => Position);
             }
         }
@@ -59,7 +59,7 @@ namespace ShadowClip.GUI
             _currentFile = message.File;
             VideoPlayer.Source = new Uri(message.File.FullName);
             VideoPlayer.Play();
-            SetPostion(0);
+            SetPostion(TimeSpan.Zero);
         }
 
         public void Handle(WindowClosing message)
@@ -69,12 +69,12 @@ namespace ShadowClip.GUI
 
         public void MarkStart()
         {
-            StartPosition = Position.TotalSeconds;
+            StartPosition = Position;
         }
 
         public void MarkEnd()
         {
-            EndPosition = Position.TotalSeconds;
+            EndPosition = Position;
         }
 
         private void PropertyUpdated(object sender, PropertyChangedEventArgs e)
@@ -86,11 +86,6 @@ namespace ShadowClip.GUI
                 SetPostion(StartPosition);
             if (e.PropertyName == "EndPostion")
                 SetPostion(EndPosition);
-        }
-
-        private void SetPostion(double position)
-        {
-            SetPostion(TimeSpan.FromSeconds(position));
         }
 
         private void SetPostion(TimeSpan position)
@@ -114,7 +109,7 @@ namespace ShadowClip.GUI
         private void VideoPlayerOnMediaOpened(object sender, RoutedEventArgs routedEventArgs)
         {
             _supressEvents = true;
-            EndPosition = (int) VideoPlayer.NaturalDuration.TimeSpan.TotalSeconds;
+            EndPosition = VideoPlayer.NaturalDuration.TimeSpan;
             _supressEvents = false;
         }
 
@@ -130,7 +125,8 @@ namespace ShadowClip.GUI
         public void Upload()
         {
             if (_currentFile != null)
-                _dialogBuilder.BuildDialog<UploadClipViewModel>(new UploadData(_currentFile, StartPosition, EndPosition));
+                _dialogBuilder.BuildDialog<UploadClipViewModel>(new UploadData(_currentFile, StartPosition.TotalSeconds,
+                    EndPosition.TotalSeconds));
         }
 
         public void GoToNextFrame()
