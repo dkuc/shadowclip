@@ -181,5 +181,22 @@ namespace ShadowClip.GUI
 
             Clipboard.SetImage(screenShot);
         }
+
+        public void PreviewClicked()
+        {
+            SetPostion(StartPosition);
+            VideoPlayer.Play();
+
+            var timer = new DispatcherTimer {Interval = TimeSpan.FromMilliseconds(16)};
+            timer.Tick += (sender, args) =>
+            {
+                if (VideoPlayer.Position >= EndPosition)
+                {
+                    VideoPlayer.Pause();
+                    timer.Stop();
+                }
+            };
+            timer.Start();
+        }
     }
 }
