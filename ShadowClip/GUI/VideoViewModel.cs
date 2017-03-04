@@ -38,9 +38,9 @@ namespace ShadowClip.GUI
         public TimeSpan Duration
             => VideoPlayer.NaturalDuration.HasTimeSpan ? VideoPlayer.NaturalDuration.TimeSpan : TimeSpan.Zero;
 
-        public int StartPostion { get; set; }
+        public double StartPosition { get; set; }
 
-        public int EndPostion { get; set; }
+        public double EndPosition { get; set; }
 
         public double CurrentPosition
         {
@@ -67,18 +67,28 @@ namespace ShadowClip.GUI
             _settings.IsMuted = VideoPlayer.IsMuted;
         }
 
+        public void MarkStart()
+        {
+            StartPosition = Position.TotalSeconds;
+        }
+
+        public void MarkEnd()
+        {
+            EndPosition = Position.TotalSeconds;
+        }
+
         private void PropertyUpdated(object sender, PropertyChangedEventArgs e)
         {
             if (_supressEvents)
                 return;
 
             if (e.PropertyName == "StartPostion")
-                SetPostion(StartPostion);
+                SetPostion(StartPosition);
             if (e.PropertyName == "EndPostion")
-                SetPostion(EndPostion);
+                SetPostion(EndPosition);
         }
 
-        private void SetPostion(int position)
+        private void SetPostion(double position)
         {
             SetPostion(TimeSpan.FromSeconds(position));
         }
@@ -104,7 +114,7 @@ namespace ShadowClip.GUI
         private void VideoPlayerOnMediaOpened(object sender, RoutedEventArgs routedEventArgs)
         {
             _supressEvents = true;
-            EndPostion = (int) VideoPlayer.NaturalDuration.TimeSpan.TotalSeconds;
+            EndPosition = (int) VideoPlayer.NaturalDuration.TimeSpan.TotalSeconds;
             _supressEvents = false;
         }
 
@@ -120,7 +130,7 @@ namespace ShadowClip.GUI
         public void Upload()
         {
             if (_currentFile != null)
-                _dialogBuilder.BuildDialog<UploadClipViewModel>(new UploadData(_currentFile, StartPostion, EndPostion));
+                _dialogBuilder.BuildDialog<UploadClipViewModel>(new UploadData(_currentFile, StartPosition, EndPosition));
         }
 
         public void GoToNextFrame()

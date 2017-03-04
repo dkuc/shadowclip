@@ -16,7 +16,7 @@ namespace ShadowClip.services
             _uploader = uploader;
         }
 
-        public async Task ClipAndUpload(string originalFile, string clipName, int start, int end,
+        public async Task ClipAndUpload(string originalFile, string clipName, double start, double end,
             IProgress<EncodeProgress> encodeProgress, IProgress<UploadProgress> uploadProgress,
             CancellationToken cancelToken)
         {

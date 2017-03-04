@@ -1,4 +1,6 @@
-﻿* Add delete buttons to file list
+﻿* Start and End no longer restricted to whole seconds.(Should be the exact frame)
+* Replaced start/end sliders with buttons
+* Add delete buttons to file list
 * Added thumbnail previews(Looking for feedback on performance hit)
 * Better streaming encoder settings. Should make frame-by-frame better.
 * Added screenshot button

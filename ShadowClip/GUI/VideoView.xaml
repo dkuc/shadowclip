@@ -31,11 +31,6 @@
                         <ColumnDefinition Width="*" />
                         <ColumnDefinition Width="auto" />
                     </Grid.ColumnDefinitions>
-                    <Grid.RowDefinitions>
-                        <RowDefinition />
-                        <RowDefinition />
-                        <RowDefinition />
-                    </Grid.RowDefinitions>
                     <Button Content="{Binding CurrentMediaState, Converter={StaticResource PlayActionCoverter}}"
                             Name="TogglePlay" MinWidth="40" />
                     <Slider Grid.Row="0" Grid.Column="1" Name="VideoSlider"
@@ -47,44 +42,25 @@
                             IsMoveToPointEnabled="True" />
 
                     <StackPanel Grid.Row="0" Grid.Column="2" Orientation="Horizontal" HorizontalAlignment="Center">
-
                         <TextBlock Text="{Binding Position, StringFormat=mm\\:ss}" />
                         <TextBlock Text=" / " />
                         <TextBlock Text="{Binding Duration, StringFormat=mm\\:ss}" />
                         <CheckBox Content="Muted" IsChecked="{Binding VideoPlayer.IsMuted}" />
-
-
-                    </StackPanel>
-                    <Slider Grid.Row="1" Grid.Column="1" Name="StartSlider"
-                            TickPlacement="BottomRight"
-                            TickFrequency="1" Minimum="0"
-                            Maximum="{Binding Duration, Converter={StaticResource MaxLength}}"
-                            IsSnapToTickEnabled="True"
-                            Value="{Binding StartPostion}"
-                            IsMoveToPointEnabled="True" />
-                    <StackPanel Grid.Row="1" Grid.Column="2" Orientation="Horizontal" HorizontalAlignment="Right">
-                        <TextBlock Text="Start: " />
-                        <TextBlock HorizontalAlignment="Right"
-                                   Text="{Binding ElementName=StartSlider, Path=Value, Converter={StaticResource IntegerSecondsConverter}}"
-                                   MinWidth="30" />
-                    </StackPanel>
-
-
-                    <Slider Grid.Row="2" Grid.Column="1" Name="EndSlider"
-                            TickPlacement="BottomRight"
-                            TickFrequency="1" Minimum="0"
-                            Maximum="{Binding Duration, Converter={StaticResource MaxLength}}"
-                            IsSnapToTickEnabled="True"
-                            Value="{Binding EndPostion}" HorizontalAlignment="Stretch"
-                            IsMoveToPointEnabled="True" />
-                    <StackPanel Grid.Row="2" Grid.Column="2" Orientation="Horizontal" HorizontalAlignment="Right">
-                        <TextBlock Text="End: " />
-                        <TextBlock HorizontalAlignment="Right"
-                                   Text="{Binding ElementName=EndSlider, Path=Value, Converter={StaticResource IntegerSecondsConverter}}"
-                                   MinWidth="30" />
                     </StackPanel>
 
                 </Grid>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                    <Button Content="Mark Start" Name="MarkStart" />
+                    <TextBlock Text="Start: " />
+                    <TextBlock HorizontalAlignment="Right"
+                               Text="{Binding StartPosition, Converter={StaticResource IntegerSecondsConverter}}"
+                               MinWidth="30" />
+                    <Button Content="Mark End" Name="MarkEnd" />
+                    <TextBlock Text="End: " />
+                    <TextBlock HorizontalAlignment="Right"
+                               Text="{Binding EndPosition,  Converter={StaticResource IntegerSecondsConverter}}"
+                               MinWidth="30" />
+                </StackPanel>
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                     <Button Content="Upload Clip" Name="Upload" />
                     <Button Content="Copy Screenshot" Name="Screenshot" />

@@ -12,7 +12,7 @@ namespace ShadowClip.GUI.UploadDialog
 {
     public class UploadData
     {
-        public UploadData(FileInfo originalFile, int startTime, int endTime)
+        public UploadData(FileInfo originalFile, double startTime, double endTime)
         {
             OriginalFile = originalFile;
             StartTime = startTime;
@@ -20,8 +20,8 @@ namespace ShadowClip.GUI.UploadDialog
         }
 
         public FileInfo OriginalFile { get; }
-        public int StartTime { get; }
-        public int EndTime { get; }
+        public double StartTime { get; }
+        public double EndTime { get; }
     }
 
     public enum State
@@ -58,8 +58,8 @@ namespace ShadowClip.GUI.UploadDialog
                 .Concat(new[] {' '})
                 .ToArray()));
 
-        public int StartTime { get; }
-        public int EndTime { get; }
+        public double StartTime { get; }
+        public double EndTime { get; }
 
         public bool CurrentlyUploading { get; set; }
         public bool CurrentlyEncoding { get; set; }

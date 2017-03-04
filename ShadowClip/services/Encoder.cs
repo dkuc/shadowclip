@@ -13,7 +13,7 @@ namespace ShadowClip.services
 {
     public class Encoder : IEncoder
     {
-        public Task Encode(string originalFile, string outputFile, int start, int end,
+        public Task Encode(string originalFile, string outputFile, double start, double end,
             IProgress<EncodeProgress> encodeProgresss,
             CancellationToken cancelToken)
         {
@@ -38,8 +38,8 @@ namespace ShadowClip.services
 
                     resolution.width = sourceTitle.Geometry.Width;
                     resolution.height = sourceTitle.Geometry.Height;
-                    settings.Source.Range.Start = start * 90000;
-                    settings.Source.Range.End = end * 90000;
+                    settings.Source.Range.Start = (int) (start * 60) + 1;
+                    settings.Source.Range.End = (int) (end * 60) + 1;
 
                     settings.Source.Path = originalFile;
 

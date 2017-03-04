@@ -88,7 +88,7 @@
   "Source": {
     "Angle": 1,
     "Range": {
-      "Type": "time",
+      "Type": "frame",
       "Start": 1,
       "End": 1
     },
