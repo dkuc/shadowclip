@@ -10,14 +10,14 @@ namespace ShadowClip.GUI
 {
     public sealed class UpdateViewModel : Screen
     {
-        public Version NewVersion { get; }
-        public string ReleaseNotes { get; set; }
-
         public UpdateViewModel(Version data)
         {
             NewVersion = data;
             DisplayName = $"New Update: {data}";
         }
+
+        public Version NewVersion { get; }
+        public string ReleaseNotes { get; set; }
 
         protected override void OnViewLoaded(object view)
         {
@@ -32,10 +32,10 @@ namespace ShadowClip.GUI
                 var originalLength = File.ReadAllLines("release_notes.txt").Length;
                 var newVersion = NewVersion.ToString().Replace('.', '_');
                 var url = ApplicationDeployment.CurrentDeployment.UpdateLocation;
-                string baseUrl = url.AbsoluteUri.Remove(url.AbsoluteUri.Length - url.Segments.Last().Length);
+                var baseUrl = url.AbsoluteUri.Remove(url.AbsoluteUri.Length - url.Segments.Last().Length);
 
                 var notesUri = $"{baseUrl}Application%20Files/ShadowClip_{newVersion}/release_notes.txt.deploy";
-                HttpClient client = new HttpClient();
+                var client = new HttpClient();
                 var newReleaseNotes = await client.GetStringAsync(notesUri);
                 var lines = newReleaseNotes.Split(Environment.NewLine.ToCharArray(),
                     StringSplitOptions.RemoveEmptyEntries);
@@ -51,7 +51,7 @@ namespace ShadowClip.GUI
 
         public void Cancel()
         {
-            this.TryClose();
+            TryClose();
         }
 
         public void UpdateNow()

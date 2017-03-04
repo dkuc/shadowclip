@@ -3,7 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             xmlns:local="clr-namespace:ShadowClip" 
+             xmlns:local="clr-namespace:ShadowClip"
              xmlns:cal="http://www.caliburnproject.org"
              mc:Ignorable="d"
              d:DesignHeight="300" d:DesignWidth="300">
@@ -26,7 +26,8 @@
                         <MediaElement LoadedBehavior="Pause" ScrubbingEnabled="True" Source="{Binding FullName}"
                                       IsMuted="True" Height="100" MinWidth="133" />
                         <TextBlock Padding="5,0,5,0" Text="{Binding CreationTime}" />
-                        <Button Content="X" ToolTip="Delete" VerticalAlignment="Top" Padding="5" Margin="5" cal:Message.Attach="[Event Click] = [Action Delete($dataContext)]"/>
+                        <Button Content="X" ToolTip="Delete" VerticalAlignment="Top" Padding="5" Margin="5"
+                                cal:Message.Attach="[Event Click] = [Action Delete($dataContext)]" />
                     </StackPanel>
                 </DataTemplate>
             </ListBox.ItemTemplate>

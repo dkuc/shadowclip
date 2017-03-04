@@ -1,6 +1,4 @@
-﻿using System;
-using System.IO;
-using System.Reflection;
+﻿using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -27,10 +25,10 @@ namespace ShadowClip.GUI
         {
             var scale = source.NaturalVideoHeight / source.RenderSize.Height;
 
-            double actualHeight = source.RenderSize.Height;
-            double actualWidth = source.RenderSize.Width;
-            double renderHeight = actualHeight * scale;
-            double renderWidth = actualWidth * scale;
+            var actualHeight = source.RenderSize.Height;
+            var actualWidth = source.RenderSize.Width;
+            var renderHeight = actualHeight * scale;
+            var renderWidth = actualWidth * scale;
 
             var renderTarget = new RenderTargetBitmap((int) renderWidth,
                 (int) renderHeight, 96, 96, PixelFormats.Pbgra32);
