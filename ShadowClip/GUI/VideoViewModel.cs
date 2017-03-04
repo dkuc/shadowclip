@@ -13,7 +13,7 @@ namespace ShadowClip.GUI
     public sealed class VideoViewModel : Screen, IHandle<FileSelected>, IHandle<WindowClosing>
     {
         private readonly IDialogBuilder _dialogBuilder;
-        private readonly TimeSpan _frameTime = TimeSpan.FromMilliseconds(1000 / (double) 60);
+        private readonly TimeSpan _frameTime = TimeSpan.FromTicks(166667);
         private readonly ISettings _settings;
         private FileInfo _currentFile;
         private bool _playingWhileClicked;
