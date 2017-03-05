@@ -3,7 +3,7 @@ using Caliburn.Micro;
 
 namespace ShadowClip.GUI
 {
-    public class ShellViewModel : Screen
+    public sealed class ShellViewModel : Screen
     {
         private readonly ISettings _settings;
 
@@ -17,6 +17,37 @@ namespace ShadowClip.GUI
             VideoViewModel = videoViewModel;
             FileSelectViewModel = fileSelectViewModel;
             StatusViewModel = statusViewModel;
+            DisplayName = "Shadow Clip";
+        }
+
+        public double Top
+        {
+            get { return _settings.Top; }
+            set { _settings.Top = value; }
+        }
+
+        public double Left
+        {
+            get { return _settings.Left; }
+            set { _settings.Left = value; }
+        }
+
+        public double Height
+        {
+            get { return _settings.Height; }
+            set { _settings.Height = value; }
+        }
+
+        public double Width
+        {
+            get { return _settings.Width; }
+            set { _settings.Width = value; }
+        }
+
+        public WindowState Maximized
+        {
+            get { return _settings.Maximized ? WindowState.Maximized : WindowState.Normal; }
+            set { _settings.Maximized = value == WindowState.Maximized; }
         }
 
         public GridLength FilePanelWidth
@@ -28,12 +59,6 @@ namespace ShadowClip.GUI
         public VideoViewModel VideoViewModel { get; }
         public FileSelectViewModel FileSelectViewModel { get; }
         public StatusViewModel StatusViewModel { get; }
-
-        public override string DisplayName
-        {
-            get { return "Shadow Clip"; }
-            set { }
-        }
 
         public void OnClosing()
         {

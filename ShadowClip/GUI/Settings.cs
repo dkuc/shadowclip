@@ -4,6 +4,36 @@
     {
         private readonly Properties.Settings _settings = new Properties.Settings();
 
+        public bool Maximized
+        {
+            get { return _settings.Maximized; }
+            set { _settings.Maximized = value; }
+        }
+
+        public double Width
+        {
+            get { return _settings.Width; }
+            set { _settings.Width = value; }
+        }
+
+        public double Height
+        {
+            get { return _settings.Height; }
+            set { _settings.Height = value; }
+        }
+
+        public double Left
+        {
+            get { return _settings.Left; }
+            set { _settings.Left = value; }
+        }
+
+        public double Top
+        {
+            get { return _settings.Top; }
+            set { _settings.Top = value; }
+        }
+
         public double FilePanelWidth
         {
             get { return _settings.FilePanelWidth; }
@@ -47,6 +77,11 @@
         bool ShowFileNames { get; set; }
         bool ShowPreviews { get; set; }
         double FilePanelWidth { get; set; }
+        bool Maximized { get; set; }
+        double Width { get; set; }
+        double Height { get; set; }
+        double Left { get; set; }
+        double Top { get; set; }
         void Save();
     }
 }

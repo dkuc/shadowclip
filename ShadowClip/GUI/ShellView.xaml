@@ -5,6 +5,11 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:cal="http://www.caliburnproject.org"
         mc:Ignorable="d"
+        Height="{Binding Height, Mode=TwoWay}"
+        Width="{Binding Width, Mode=TwoWay}"
+        Top="{Binding Top, Mode=TwoWay}"
+        Left="{Binding Left, Mode=TwoWay}"
+        WindowState="{Binding Maximized, Mode=TwoWay}"
         cal:Message.Attach="[Event Closing] = [Action OnClosing()]">
     <Grid>
         <Grid.RowDefinitions>
