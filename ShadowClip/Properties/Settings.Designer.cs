@@ -49,13 +49,25 @@ namespace ShadowClip.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("")]
-        public string HandbrakePath {
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool ShowPreviews {
             get {
-                return ((string)(this["HandbrakePath"]));
+                return ((bool)(this["ShowPreviews"]));
             }
             set {
-                this["HandbrakePath"] = value;
+                this["ShowPreviews"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool ShowFileNames {
+            get {
+                return ((bool)(this["ShowFileNames"]));
+            }
+            set {
+                this["ShowFileNames"] = value;
             }
         }
     }

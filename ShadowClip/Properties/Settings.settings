@@ -10,8 +10,11 @@
     <Setting Name="ShadowplayPath" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
-    <Setting Name="HandbrakePath" Type="System.String" Scope="User">
-      <Value Profile="(Default)" />
+    <Setting Name="ShowPreviews" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="ShowFileNames" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
     </Setting>
   </Settings>
 </SettingsFile>

@@ -10,7 +10,7 @@ using ShadowClip.GUI.UploadDialog;
 
 namespace ShadowClip.GUI
 {
-    public sealed class VideoViewModel : Screen, IHandle<FileSelected>, IHandle<WindowClosing>
+    public sealed class VideoViewModel : Screen, IHandle<FileSelected>
     {
         private readonly IDialogBuilder _dialogBuilder;
         private readonly TimeSpan _frameTime = TimeSpan.FromTicks(166667);
@@ -62,11 +62,6 @@ namespace ShadowClip.GUI
             SetPostion(TimeSpan.Zero);
         }
 
-        public void Handle(WindowClosing message)
-        {
-            _settings.IsMuted = VideoPlayer.IsMuted;
-        }
-
         public void MarkStart()
         {
             StartPosition = Position;
@@ -100,7 +95,12 @@ namespace ShadowClip.GUI
         {
             _videoView = (VideoView) view;
             VideoPlayer.MediaOpened += VideoPlayerOnMediaOpened;
+
             VideoPlayer.IsMuted = _settings.IsMuted;
+            DependencyPropertyDescriptor
+                .FromProperty(MediaElement.IsMutedProperty, typeof(MediaElement))
+                .AddValueChanged(VideoPlayer, (s, e) => { _settings.IsMuted = VideoPlayer.IsMuted; });
+
             var timer = new DispatcherTimer {Interval = TimeSpan.FromSeconds(1)};
             timer.Tick += (sender, args) => NotifyOfPropertyChange("");
             timer.Start();

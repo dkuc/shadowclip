@@ -4,14 +4,15 @@ namespace ShadowClip.GUI
 {
     public class ShellViewModel : Screen
     {
-        private readonly IEventAggregator _eventAggregator;
+        private readonly ISettings _settings;
+
 
         public ShellViewModel(VideoViewModel videoViewModel,
             FileSelectViewModel fileSelectViewModel,
             StatusViewModel statusViewModel,
-            IEventAggregator eventAggregator)
+            ISettings settings)
         {
-            _eventAggregator = eventAggregator;
+            _settings = settings;
             VideoViewModel = videoViewModel;
             FileSelectViewModel = fileSelectViewModel;
             StatusViewModel = statusViewModel;
@@ -29,7 +30,7 @@ namespace ShadowClip.GUI
 
         public void OnClosing()
         {
-            _eventAggregator.PublishOnUIThread(new WindowClosing());
+            _settings.Save();
         }
     }
 }

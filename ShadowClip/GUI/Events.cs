@@ -11,8 +11,4 @@ namespace ShadowClip.GUI
 
         public FileInfo File { get; }
     }
-
-    public class WindowClosing
-    {
-    }
 }

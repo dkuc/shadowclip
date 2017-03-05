@@ -9,7 +9,7 @@ using Screen = Caliburn.Micro.Screen;
 
 namespace ShadowClip.GUI
 {
-    public sealed class FileSelectViewModel : Screen, IHandle<WindowClosing>
+    public sealed class FileSelectViewModel : Screen
     {
         private readonly IEventAggregator _eventAggregator;
         private readonly BindableCollection<FileInfo> _files = new BindableCollection<FileInfo>();
@@ -22,25 +22,34 @@ namespace ShadowClip.GUI
             _settings = settings;
             PropertyChanged += PropertyUpdated;
             Path = _settings.ShadowplayPath;
-            eventAggregator.Subscribe(this);
             Files = CollectionViewSource.GetDefaultView(_files);
             Files.SortDescriptions.Add(new SortDescription("CreationTime", ListSortDirection.Descending));
         }
 
 
-        public ICollectionView Files { get; }
+        public bool ShowPreviews
+        {
+            get { return _settings.ShowPreviews; }
+            set { _settings.ShowPreviews = value; }
+        }
 
+        public bool ShowFileNames
+        {
+            get { return _settings.ShowFileNames; }
+            set { _settings.ShowFileNames = value; }
+        }
+
+        public string Path
+        {
+            get { return _settings.ShadowplayPath; }
+            set { _settings.ShadowplayPath = value; }
+        }
+
+        public ICollectionView Files { get; }
 
         public FileInfo SelectedFile { get; set; }
 
         public string ErrorMessage { get; set; }
-
-        public string Path { get; set; }
-
-        public void Handle(WindowClosing message)
-        {
-            _settings.ShadowplayPath = Path;
-        }
 
         protected override void OnViewLoaded(object view)
         {

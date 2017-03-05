@@ -4,34 +4,33 @@
     {
         private readonly Properties.Settings _settings = new Properties.Settings();
 
-        public bool IsMuted
+        public bool ShowFileNames
         {
-            get { return _settings.IsMuted; }
-            set
-            {
-                _settings.IsMuted = value;
-                _settings.Save();
-            }
+            get { return _settings.ShowFileNames; }
+            set { _settings.ShowFileNames = value; }
+        }
+
+        public bool ShowPreviews
+        {
+            get { return _settings.ShowPreviews; }
+            set { _settings.ShowPreviews = value; }
         }
 
         public string ShadowplayPath
         {
             get { return _settings.ShadowplayPath; }
-            set
-            {
-                _settings.ShadowplayPath = value;
-                _settings.Save();
-            }
+            set { _settings.ShadowplayPath = value; }
         }
 
-        public string HandbrakePath
+        public bool IsMuted
         {
-            get { return _settings.HandbrakePath; }
-            set
-            {
-                _settings.HandbrakePath = value;
-                _settings.Save();
-            }
+            get { return _settings.IsMuted; }
+            set { _settings.IsMuted = value; }
+        }
+
+        public void Save()
+        {
+            _settings.Save();
         }
     }
 
@@ -39,6 +38,8 @@
     {
         bool IsMuted { get; set; }
         string ShadowplayPath { get; set; }
-        string HandbrakePath { get; set; }
+        bool ShowFileNames { get; set; }
+        bool ShowPreviews { get; set; }
+        void Save();
     }
 }
