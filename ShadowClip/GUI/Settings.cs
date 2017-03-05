@@ -4,6 +4,12 @@
     {
         private readonly Properties.Settings _settings = new Properties.Settings();
 
+        public double FilePanelWidth
+        {
+            get { return _settings.FilePanelWidth; }
+            set { _settings.FilePanelWidth = value; }
+        }
+
         public bool ShowFileNames
         {
             get { return _settings.ShowFileNames; }
@@ -40,6 +46,7 @@
         string ShadowplayPath { get; set; }
         bool ShowFileNames { get; set; }
         bool ShowPreviews { get; set; }
+        double FilePanelWidth { get; set; }
         void Save();
     }
 }

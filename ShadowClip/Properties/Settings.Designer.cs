@@ -70,5 +70,17 @@ namespace ShadowClip.Properties {
                 this["ShowFileNames"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("350")]
+        public double FilePanelWidth {
+            get {
+                return ((double)(this["FilePanelWidth"]));
+            }
+            set {
+                this["FilePanelWidth"] = value;
+            }
+        }
     }
 }

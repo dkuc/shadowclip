@@ -1,4 +1,5 @@
-﻿using Caliburn.Micro;
+﻿using System.Windows;
+using Caliburn.Micro;
 
 namespace ShadowClip.GUI
 {
@@ -16,6 +17,12 @@ namespace ShadowClip.GUI
             VideoViewModel = videoViewModel;
             FileSelectViewModel = fileSelectViewModel;
             StatusViewModel = statusViewModel;
+        }
+
+        public GridLength FilePanelWidth
+        {
+            get { return new GridLength(_settings.FilePanelWidth); }
+            set { _settings.FilePanelWidth = value.Value; }
         }
 
         public VideoViewModel VideoViewModel { get; }

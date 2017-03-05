@@ -13,7 +13,7 @@
         </Grid.RowDefinitions>
         <Grid>
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="350" />
+                <ColumnDefinition Width="{Binding FilePanelWidth, Mode=TwoWay}" />
                 <ColumnDefinition Width="5" />
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
