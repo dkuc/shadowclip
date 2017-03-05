@@ -1,4 +1,6 @@
-﻿* Increased frame time precision.
+﻿* Save window position, size, and state between runs
+* Added ability to show/hide preview thumbnails and file names
+* Increased frame time precision.
 * Add ability to preview clips
 * Start and End no longer restricted to whole seconds.(Should be the exact frame)
 * Replaced start/end sliders with buttons
