@@ -12,11 +12,12 @@ namespace ShadowClip.GUI
     {
         public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
         {
-            if (!(values[0] is TimeSpan start)) return null;
-            if (!(values[1] is TimeSpan end)) return null;
-            if (!(values[2] is TimeSpan duration)) return null;
-            if (!(values[3] is double width)) return null;
-            if (duration.Ticks == 0) return null;
+            var thickness = new Thickness();
+            if (!(values[0] is TimeSpan start)) return thickness;
+            if (!(values[1] is TimeSpan end)) return thickness;
+            if (!(values[2] is TimeSpan duration)) return thickness;
+            if (!(values[3] is double width)) return thickness;
+            if (duration.Ticks == 0) return thickness;
 
             var startOffset = start.TotalSeconds / duration.TotalSeconds * width;
             var endOffset = end.TotalSeconds / duration.TotalSeconds * width;
