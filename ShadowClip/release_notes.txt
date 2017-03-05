@@ -1,4 +1,6 @@
-﻿* Start and End no longer restricted to whole seconds.(Should be the exact frame)
+﻿* Increased frame time precision.
+* Add ability to preview clips
+* Start and End no longer restricted to whole seconds.(Should be the exact frame)
 * Replaced start/end sliders with buttons
 * Add delete buttons to file list
 * Added thumbnail previews(Looking for feedback on performance hit)
