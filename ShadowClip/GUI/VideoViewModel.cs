@@ -116,7 +116,6 @@ namespace ShadowClip.GUI
 
         public void TogglePlay()
         {
-            Debug.WriteLine("Toggle");
             if (CurrentMediaState == MediaState.Play)
                 VideoPlayer.Pause();
             else
@@ -162,8 +161,6 @@ namespace ShadowClip.GUI
 
         public void VideoClicked(MouseButtonEventArgs eventArgs)
         {
-            
-
             var firstPostition = eventArgs.GetPosition(_videoView).X;
             var previousPosition = firstPostition;
             var lastUpdate = DateTime.Now;
