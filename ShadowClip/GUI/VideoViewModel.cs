@@ -1,5 +1,6 @@
 using System;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.IO;
 using System.Windows;
 using System.Windows.Controls;
@@ -115,6 +116,7 @@ namespace ShadowClip.GUI
 
         public void TogglePlay()
         {
+            Debug.WriteLine("Toggle");
             if (CurrentMediaState == MediaState.Play)
                 VideoPlayer.Pause();
             else
@@ -158,10 +160,49 @@ namespace ShadowClip.GUI
             }
         }
 
-        public void VideoClicked()
+        public void VideoClicked(MouseButtonEventArgs eventArgs)
         {
-            TogglePlay();
-            _videoView.VideoSlider.Focus();
+            
+
+            var firstPostition = eventArgs.GetPosition(_videoView).X;
+            var previousPosition = firstPostition;
+            var lastUpdate = DateTime.Now;
+            MouseEventHandler videoViewOnMouseMove = (sender, args) =>
+            {
+                if ((DateTime.Now - lastUpdate).TotalMilliseconds < 10)
+                    return;
+
+                VideoPlayer.Pause();
+                var newPosition = args.GetPosition(_videoView).X;
+                var delta = newPosition - previousPosition;
+                previousPosition = newPosition;
+                var videoPlayerPosition = TimeSpan.FromTicks((long) (delta * 10000));
+                VideoPlayer.Position += videoPlayerPosition;
+
+                lastUpdate = DateTime.Now;
+            };
+
+            MouseButtonEventHandler videoViewOnMouseUp = null;
+            videoViewOnMouseUp = (sender, args) =>
+            {
+                Mouse.Capture(null);
+                _videoView.MouseMove -= videoViewOnMouseMove;
+                _videoView.MouseUp -= videoViewOnMouseUp;
+                if (Math.Abs(previousPosition - firstPostition) < .001)
+                {
+                    Debug.WriteLine($"{previousPosition} - {firstPostition}");
+                    TogglePlay();
+                }
+            };
+            _videoView.MouseUp += videoViewOnMouseUp;
+
+            _videoView.MouseMove += videoViewOnMouseMove;
+            Mouse.Capture(_videoView);
+            Mouse.AddLostMouseCaptureHandler(_videoView, (sender, args) =>
+            {
+                Mouse.Capture(null);
+                _videoView.MouseMove -= videoViewOnMouseMove;
+            });
         }
 
         public void SliderClicked()

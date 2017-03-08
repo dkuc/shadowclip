@@ -22,7 +22,8 @@
                       MinWidth="300"
                       ScrubbingEnabled="True"
                       LoadedBehavior="Manual"
-                      cal:Message.Attach="[Event MouseUp] = [Action VideoClicked()]" HorizontalAlignment="Center"
+                      cal:Message.Attach="[Event MouseDown] = [Action VideoClicked($eventArgs)];"
+                      HorizontalAlignment="Center"
                       VerticalAlignment="Bottom" />
         <Grid Grid.Row="1">
             <StackPanel>
