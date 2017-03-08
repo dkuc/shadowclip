@@ -1,4 +1,5 @@
-﻿* Save window position, size, and state between runs
+﻿* Added ability to click and drag video for slow motion
+* Save window position, size, and state between runs
 * Added ability to show/hide preview thumbnails and file names
 * Increased frame time precision.
 * Add ability to preview clips
