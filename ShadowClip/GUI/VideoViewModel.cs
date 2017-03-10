@@ -1,6 +1,5 @@
 using System;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.IO;
 using System.Windows;
 using System.Windows.Controls;
@@ -18,14 +17,12 @@ namespace ShadowClip.GUI
         private readonly ISettings _settings;
         private FileInfo _currentFile;
         private bool _playingWhileClicked;
-        private bool _supressEvents;
         private VideoView _videoView;
 
         public VideoViewModel(IEventAggregator eventAggregator, ISettings settings, IDialogBuilder dialogBuilder)
         {
             _settings = settings;
             _dialogBuilder = dialogBuilder;
-            PropertyChanged += PropertyUpdated;
             eventAggregator.Subscribe(this);
         }
 
@@ -75,17 +72,6 @@ namespace ShadowClip.GUI
             EndPosition = Position;
         }
 
-        private void PropertyUpdated(object sender, PropertyChangedEventArgs e)
-        {
-            if (_supressEvents)
-                return;
-
-            if (e.PropertyName == "StartPostion")
-                SetPostion(StartPosition);
-            if (e.PropertyName == "EndPostion")
-                SetPostion(EndPosition);
-        }
-
         private void SetPostion(TimeSpan position)
         {
             VideoPlayer.Pause();
@@ -111,9 +97,7 @@ namespace ShadowClip.GUI
 
         private void VideoPlayerOnMediaOpened(object sender, RoutedEventArgs routedEventArgs)
         {
-            _supressEvents = true;
             EndPosition = VideoPlayer.NaturalDuration.TimeSpan;
-            _supressEvents = false;
         }
 
         public void TogglePlay()
@@ -189,7 +173,6 @@ namespace ShadowClip.GUI
                 _videoView.MouseUp -= videoViewOnMouseUp;
                 if (Math.Abs(previousPosition - firstPostition) < .001)
                 {
-                    Debug.WriteLine($"{previousPosition} - {firstPostition}");
                     TogglePlay();
                 }
             };
