@@ -12,19 +12,46 @@
         <gui:PlayActionCoverter x:Key="PlayActionCoverter" />
         <gui:IntegerSecondsConverter x:Key="IntegerSecondsConverter" />
         <gui:DurationMarginConverter x:Key="DurationMarginConverter" />
+        <gui:VideoZoomConverter x:Key="VideoZoomConverter" />
     </UserControl.Resources>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
-        <MediaElement Name="Video"
-                      MinWidth="300"
-                      ScrubbingEnabled="True"
-                      LoadedBehavior="Manual"
-                      cal:Message.Attach="[Event MouseDown] = [Action VideoClicked($eventArgs)];"
-                      HorizontalAlignment="Center"
-                      VerticalAlignment="Bottom" />
+        <Canvas ClipToBounds="True" Name="VideoCanvas">
+            <MediaElement Name="Video"
+                          MinWidth="300"
+                          ScrubbingEnabled="True"
+                          LoadedBehavior="Manual"
+                          ClipToBounds="True"
+                          Height="{Binding ElementName=VideoCanvas, Path=ActualHeight}"
+                          Width="{Binding ElementName=VideoCanvas, Path=ActualWidth}"
+
+                          cal:Message.Attach="[Event MouseDown] = [Action VideoClicked($eventArgs)];">
+
+                <MediaElement.RenderTransform>
+                    <ScaleTransform ScaleX="{Binding Zoom}" ScaleY="{Binding Zoom}">
+                        <ScaleTransform.CenterY>
+                            <MultiBinding Converter="{StaticResource VideoZoomConverter}" ConverterParameter="height">
+                                <Binding Path="VideoPlayer.NaturalVideoWidth" />
+                                <Binding Path="VideoPlayer.NaturalVideoHeight" />
+                                <Binding ElementName="Video" Path="Width" />
+                                <Binding ElementName="Video" Path="Height" />
+                            </MultiBinding>
+                        </ScaleTransform.CenterY>
+                        <ScaleTransform.CenterX>
+                            <MultiBinding Converter="{StaticResource VideoZoomConverter}" ConverterParameter="width">
+                                <Binding Path="VideoPlayer.NaturalVideoWidth" />
+                                <Binding Path="VideoPlayer.NaturalVideoHeight" />
+                                <Binding ElementName="Video" Path="Width" />
+                                <Binding ElementName="Video" Path="Height" />
+                            </MultiBinding>
+                        </ScaleTransform.CenterX>
+                    </ScaleTransform>
+                </MediaElement.RenderTransform>
+            </MediaElement>
+        </Canvas>
         <Grid Grid.Row="1">
             <StackPanel>
                 <Grid Width="{Binding ElementName=Video, Path=ActualWidth}" HorizontalAlignment="Center">
@@ -63,12 +90,22 @@
                             Maximum="{Binding Duration, Converter={StaticResource MaxLength}}"
                             Value="{Binding CurrentPosition}" HorizontalAlignment="Stretch"
                             IsMoveToPointEnabled="True" />
+                    <StackPanel Grid.Row="0" Grid.Column="2" HorizontalAlignment="Center">
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                            <TextBlock Text="{Binding Position, StringFormat=mm\\:ss}" />
+                            <TextBlock Text=" / " />
+                            <TextBlock Text="{Binding Duration, StringFormat=mm\\:ss}" />
+                            <CheckBox Content="Muted" IsChecked="{Binding VideoPlayer.IsMuted}" />
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="Zoom:" />
+                            <ComboBox SelectedValuePath="Tag" SelectedValue="{Binding Zoom}">
+                                <ComboBoxItem Tag="1" IsSelected="True">1x</ComboBoxItem>
+                                <ComboBoxItem Tag="2">2x</ComboBoxItem>
+                                <ComboBoxItem Tag="4">4x</ComboBoxItem>
+                            </ComboBox>
+                        </StackPanel>
 
-                    <StackPanel Grid.Row="0" Grid.Column="2" Orientation="Horizontal" HorizontalAlignment="Center">
-                        <TextBlock Text="{Binding Position, StringFormat=mm\\:ss}" />
-                        <TextBlock Text=" / " />
-                        <TextBlock Text="{Binding Duration, StringFormat=mm\\:ss}" />
-                        <CheckBox Content="Muted" IsChecked="{Binding VideoPlayer.IsMuted}" />
                     </StackPanel>
 
                 </Grid>

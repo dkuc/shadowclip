@@ -8,6 +8,31 @@ using ShadowClip.GUI.UploadDialog;
 
 namespace ShadowClip.GUI
 {
+    internal class VideoZoomConverter : IMultiValueConverter
+    {
+        public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (!(values[0] is int naturalWidth)) return null;
+            if (!(values[1] is int naturalHeight)) return null;
+            if (!(values[2] is double width)) return null;
+            if (!(values[3] is double height)) return null;
+            if (!(parameter is string dimension)) return null;
+
+            var isHeight = dimension == "height";
+
+            var aspectRatio = naturalWidth / (double) naturalHeight;
+            if (height * aspectRatio > width)
+                return isHeight ? width / aspectRatio / 2 : width / 2;
+
+            return isHeight ? height / 2 : height * aspectRatio / 2;
+        }
+
+        public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
     internal class VideoSourceConverter : IMultiValueConverter
     {
         public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)

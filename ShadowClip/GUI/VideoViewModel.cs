@@ -29,6 +29,8 @@ namespace ShadowClip.GUI
             eventAggregator.Subscribe(this);
         }
 
+        public int Zoom { get; set; } = 1;
+
         public MediaElement VideoPlayer => _videoView.Video;
 
         public MediaState CurrentMediaState => VideoPlayer.GetMediaState();
