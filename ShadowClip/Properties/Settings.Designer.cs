@@ -142,5 +142,17 @@ namespace ShadowClip.Properties {
                 this["Maximized"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool UseFfmpeg {
+            get {
+                return ((bool)(this["UseFfmpeg"]));
+            }
+            set {
+                this["UseFfmpeg"] = value;
+            }
+        }
     }
 }

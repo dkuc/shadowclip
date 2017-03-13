@@ -68,6 +68,12 @@
         {
             _settings.Save();
         }
+
+        public bool UseFfmpeg
+        {
+            get { return _settings.UseFfmpeg; }
+            set { _settings.UseFfmpeg = value; }
+        }
     }
 
     public interface ISettings
@@ -82,6 +88,7 @@
         double Height { get; set; }
         double Left { get; set; }
         double Top { get; set; }
+        bool UseFfmpeg { get; set; }
         void Save();
     }
 }

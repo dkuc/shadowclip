@@ -2,28 +2,33 @@
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Practices.Unity;
 
 namespace ShadowClip.services
 {
     public class ClipCreator : IClipCreator
     {
-        private readonly IEncoder _encoder;
+        private readonly IUnityContainer _container;
         private readonly IUploader _uploader;
 
-        public ClipCreator(IEncoder encoder, IUploader uploader)
+        public ClipCreator(IUnityContainer container, IUploader uploader)
         {
-            _encoder = encoder;
+            _container = container;
             _uploader = uploader;
         }
 
-        public async Task ClipAndUpload(string originalFile, string clipName, double start, double end,
+        public async Task ClipAndUpload(string originalFile, string clipName, double start, double end, bool useFfmpeg,
             IProgress<EncodeProgress> encodeProgress, IProgress<UploadProgress> uploadProgress,
             CancellationToken cancelToken)
         {
+            var encoder = useFfmpeg
+                ? (IEncoder) _container.Resolve<FfmpegEncoder>()
+                : _container.Resolve<HandbrakeEncoder>();
+
             var outputFile = Path.GetTempFileName();
             try
             {
-                await _encoder.Encode(originalFile, outputFile, start, end, encodeProgress, cancelToken);
+                await encoder.Encode(originalFile, outputFile, start, end, encodeProgress, cancelToken);
                 await _uploader.UploadFile(outputFile, clipName, uploadProgress, cancelToken);
             }
             finally

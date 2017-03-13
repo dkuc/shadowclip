@@ -19,6 +19,13 @@
                 <TextBlock Text="{Binding StartTime, StringFormat=Start: {0}s  }" Margin="20,0" />
                 <TextBlock Text="{Binding EndTime, StringFormat=End: {0}s  }" />
             </StackPanel>
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Text="Encoder: " />
+                <RadioButton Content="Handbrake (cpu)" IsChecked="True" 
+                             IsEnabled="{Binding CurrentState,Converter={StaticResource StateToBoolConverter},ConverterParameter='ready,error'}" />
+                <RadioButton Content="FFMPEG (gpu)" IsChecked="{Binding UseFfmpeg}"
+                             IsEnabled="{Binding CurrentState,Converter={StaticResource StateToBoolConverter},ConverterParameter='ready,error'}"/>
+            </StackPanel>
 
 
             <StackPanel Orientation="Horizontal">

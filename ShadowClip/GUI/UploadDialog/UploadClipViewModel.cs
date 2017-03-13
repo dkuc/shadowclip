@@ -35,11 +35,13 @@ namespace ShadowClip.GUI.UploadDialog
     public sealed class UploadClipViewModel : Screen
     {
         private readonly IClipCreator _clipCreator;
+        private readonly ISettings _settings;
         private CancellationTokenSource _cancelToken;
 
-        public UploadClipViewModel(IClipCreator clipCreator, UploadData data)
+        public UploadClipViewModel(IClipCreator clipCreator, UploadData data, ISettings settings)
         {
             _clipCreator = clipCreator;
+            _settings = settings;
             OriginalFile = data.OriginalFile;
             StartTime = data.StartTime;
             EndTime = data.EndTime;
@@ -70,6 +72,7 @@ namespace ShadowClip.GUI.UploadDialog
         public int UploadRate { get; set; }
         public bool OperationInProgress { get; set; }
         public bool DeleteOnSuccess { get; set; }
+        public bool UseFfmpeg { get; set; }
 
         public string ErrorText { get; set; }
 
@@ -93,6 +96,7 @@ namespace ShadowClip.GUI.UploadDialog
                 await _clipCreator.ClipAndUpload(OriginalFile.FullName, $"{SafeFileName}.mp4",
                     StartTime,
                     EndTime,
+                    UseFfmpeg,
                     new Progress<EncodeProgress>(ep =>
                     {
                         EncodeProgress = ep.PercentComplete;
@@ -141,6 +145,16 @@ namespace ShadowClip.GUI.UploadDialog
         protected override void OnDeactivate(bool close)
         {
             Cancel();
+        }
+
+        protected override void OnActivate()
+        {
+            UseFfmpeg = _settings.UseFfmpeg;
+        }
+
+        public void OnUseFfmpegChanged()
+        {
+            _settings.UseFfmpeg = UseFfmpeg;
         }
     }
 }
