@@ -1,5 +1,6 @@
 using System;
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Windows;
 using System.Windows.Controls;
@@ -145,6 +146,7 @@ namespace ShadowClip.GUI
             }
         }
 
+        [SuppressMessage("ReSharper", "AccessToModifiedClosure")]
         public void VideoClicked(MouseButtonEventArgs eventArgs)
         {
             var firstPostition = eventArgs.GetPosition(_videoView).X;
@@ -166,25 +168,32 @@ namespace ShadowClip.GUI
             };
 
             MouseButtonEventHandler videoViewOnMouseUp = null;
+            MouseEventHandler onMouseLostFocus = null;
             videoViewOnMouseUp = (sender, args) =>
             {
                 Mouse.Capture(null);
                 _videoView.MouseMove -= videoViewOnMouseMove;
                 _videoView.MouseUp -= videoViewOnMouseUp;
+                // ReSharper disable once AssignNullToNotNullAttribute
+                Mouse.RemoveLostMouseCaptureHandler(_videoView, onMouseLostFocus);
                 if (Math.Abs(previousPosition - firstPostition) < .001)
                 {
                     TogglePlay();
                 }
             };
-            _videoView.MouseUp += videoViewOnMouseUp;
-
-            _videoView.MouseMove += videoViewOnMouseMove;
-            Mouse.Capture(_videoView);
-            Mouse.AddLostMouseCaptureHandler(_videoView, (sender, args) =>
+            
+            onMouseLostFocus = (sender, args) =>
             {
                 Mouse.Capture(null);
                 _videoView.MouseMove -= videoViewOnMouseMove;
-            });
+                Mouse.RemoveLostMouseCaptureHandler(_videoView, onMouseLostFocus);
+            };
+
+
+            Mouse.AddLostMouseCaptureHandler(_videoView, onMouseLostFocus);
+            _videoView.MouseUp += videoViewOnMouseUp;
+            _videoView.MouseMove += videoViewOnMouseMove;
+            Mouse.Capture(_videoView);
         }
 
         public void SliderClicked()
