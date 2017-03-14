@@ -1,4 +1,6 @@
-﻿* Added option to use gpu acceleration for encoding via FFMPEG
+﻿* Zoom Applies to encoded video
+* Fix zoom drop down getting stuck
+* Added option to use gpu acceleration for encoding via FFMPEG
 * Added video zoom
 * Added ability to click and drag video for slow motion
 * Save window position, size, and state between runs
