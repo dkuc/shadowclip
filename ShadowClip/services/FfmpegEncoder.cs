@@ -9,9 +9,8 @@ namespace ShadowClip.services
 {
     public class FfmpegEncoder : IEncoder
     {
-        public Task Encode(string originalFile, string outputFile, double start, double end,
-            IProgress<EncodeProgress> encodeProgresss,
-            CancellationToken cancelToken)
+        public Task Encode(string originalFile, string outputFile, double start, double end, int zoom,
+            IProgress<EncodeProgress> encodeProgresss, CancellationToken cancelToken)
         {
             var taskCompletionSource = new TaskCompletionSource<bool>();
             var lastOutput = "";
@@ -22,6 +21,8 @@ namespace ShadowClip.services
             {
                 if (duration <= 0)
                     throw new Exception("Invalid start and end times.");
+
+                var filter = zoom > 1 ? $"-vf \"scale={zoom}*iw:-1, crop = iw / {zoom}:ih / {zoom}\"" : "";
 
 
                 var process = new Process
@@ -34,7 +35,7 @@ namespace ShadowClip.services
                         CreateNoWindow = true,
                         FileName = @"ffmpeg.exe",
                         Arguments =
-                            $"-nostdin -i \"{originalFile}\" -c:v h264_nvenc -ss {start} -t {duration}  -profile:v high -b:v 10000k -movflags faststart -f mp4 -y \"{outputFile}\""
+                            $"-nostdin -i \"{originalFile}\" -c:v h264_nvenc -ss {start} -t {duration} {filter}  -profile:v high -b:v 10000k -movflags faststart -f mp4 -y \"{outputFile}\""
                     }
                 };
 

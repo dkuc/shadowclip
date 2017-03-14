@@ -13,9 +13,8 @@ namespace ShadowClip.services
 {
     public class HandbrakeEncoder : IEncoder
     {
-        public Task Encode(string originalFile, string outputFile, double start, double end,
-            IProgress<EncodeProgress> encodeProgresss,
-            CancellationToken cancelToken)
+        public Task Encode(string originalFile, string outputFile, double start, double end, int zoom,
+            IProgress<EncodeProgress> encodeProgresss, CancellationToken cancelToken)
         {
             var taskCompletionSource = new TaskCompletionSource<bool>();
 

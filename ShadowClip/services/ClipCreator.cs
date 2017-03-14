@@ -17,7 +17,8 @@ namespace ShadowClip.services
             _uploader = uploader;
         }
 
-        public async Task ClipAndUpload(string originalFile, string clipName, double start, double end, bool useFfmpeg,
+        public async Task ClipAndUpload(string originalFile, string clipName, double start, double end,
+            int zoom, bool useFfmpeg,
             IProgress<EncodeProgress> encodeProgress, IProgress<UploadProgress> uploadProgress,
             CancellationToken cancelToken)
         {
@@ -28,7 +29,7 @@ namespace ShadowClip.services
             var outputFile = Path.GetTempFileName();
             try
             {
-                await encoder.Encode(originalFile, outputFile, start, end, encodeProgress, cancelToken);
+                await encoder.Encode(originalFile, outputFile, start, end, zoom, encodeProgress, cancelToken);
                 await _uploader.UploadFile(outputFile, clipName, uploadProgress, cancelToken);
             }
             finally

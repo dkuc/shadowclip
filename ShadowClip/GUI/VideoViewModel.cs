@@ -114,7 +114,7 @@ namespace ShadowClip.GUI
         {
             if (_currentFile != null)
                 _dialogBuilder.BuildDialog<UploadClipViewModel>(new UploadData(_currentFile, StartPosition.TotalSeconds,
-                    EndPosition.TotalSeconds));
+                    EndPosition.TotalSeconds, Zoom));
         }
 
         public void GoToNextFrame()

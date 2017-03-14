@@ -12,16 +12,18 @@ namespace ShadowClip.GUI.UploadDialog
 {
     public class UploadData
     {
-        public UploadData(FileInfo originalFile, double startTime, double endTime)
+        public UploadData(FileInfo originalFile, double startTime, double endTime, int zoom)
         {
             OriginalFile = originalFile;
             StartTime = startTime;
             EndTime = endTime;
+            Zoom = zoom;
         }
 
         public FileInfo OriginalFile { get; }
         public double StartTime { get; }
         public double EndTime { get; }
+        public int Zoom { get; }
     }
 
     public enum State
@@ -45,9 +47,12 @@ namespace ShadowClip.GUI.UploadDialog
             OriginalFile = data.OriginalFile;
             StartTime = data.StartTime;
             EndTime = data.EndTime;
+            Zoom = data.Zoom;
             FileName = "";
             DisplayName = "Uploader";
         }
+
+        public int Zoom { get; }
 
         public State CurrentState { get; set; }
 
@@ -96,6 +101,7 @@ namespace ShadowClip.GUI.UploadDialog
                 await _clipCreator.ClipAndUpload(OriginalFile.FullName, $"{SafeFileName}.mp4",
                     StartTime,
                     EndTime,
+                    Zoom,
                     UseFfmpeg,
                     new Progress<EncodeProgress>(ep =>
                     {
@@ -125,6 +131,8 @@ namespace ShadowClip.GUI.UploadDialog
                 ErrorText = $"Error: {e.Message}";
             }
         }
+
+       
 
         public void Cancel()
         {
