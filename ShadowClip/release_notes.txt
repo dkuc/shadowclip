@@ -1,4 +1,5 @@
-﻿* Zoom Applies to encoded video
+﻿* Improve ffmpeg encode quality
+* Zoom Applies to encoded video
 * Fix zoom drop down getting stuck
 * Added option to use gpu acceleration for encoding via FFMPEG
 * Added video zoom
