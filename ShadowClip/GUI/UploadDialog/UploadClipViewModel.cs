@@ -12,18 +12,20 @@ namespace ShadowClip.GUI.UploadDialog
 {
     public class UploadData
     {
-        public UploadData(FileInfo originalFile, double startTime, double endTime, int zoom)
+        public UploadData(FileInfo originalFile, double startTime, double endTime, int zoom, int slowMo)
         {
             OriginalFile = originalFile;
             StartTime = startTime;
             EndTime = endTime;
             Zoom = zoom;
+            SlowMo = slowMo;
         }
 
         public FileInfo OriginalFile { get; }
         public double StartTime { get; }
         public double EndTime { get; }
         public int Zoom { get; }
+        public int SlowMo { get; }
     }
 
     public enum State
@@ -48,9 +50,12 @@ namespace ShadowClip.GUI.UploadDialog
             StartTime = data.StartTime;
             EndTime = data.EndTime;
             Zoom = data.Zoom;
+            SlowMo = data.SlowMo;
             FileName = "";
             DisplayName = "Uploader";
         }
+
+        public int SlowMo { get; set; }
 
         public int Zoom { get; }
 
@@ -102,6 +107,7 @@ namespace ShadowClip.GUI.UploadDialog
                     StartTime,
                     EndTime,
                     Zoom,
+                    SlowMo,
                     UseFfmpeg,
                     new Progress<EncodeProgress>(ep =>
                     {

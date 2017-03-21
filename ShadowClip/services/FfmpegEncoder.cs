@@ -9,11 +9,14 @@ namespace ShadowClip.services
 {
     public class FfmpegEncoder : IEncoder
     {
-        public Task Encode(string originalFile, string outputFile, double start, double end, int zoom,
+        public Task Encode(string originalFile, string outputFile, double start, double end, int zoom, int slowMo,
             IProgress<EncodeProgress> encodeProgresss, CancellationToken cancelToken)
         {
             var taskCompletionSource = new TaskCompletionSource<bool>();
             var lastOutput = "";
+
+            start = start * slowMo;
+            end = end * slowMo;
 
             var duration = end - start;
 
@@ -22,7 +25,26 @@ namespace ShadowClip.services
                 if (duration <= 0)
                     throw new Exception("Invalid start and end times.");
 
-                var filter = zoom > 1 ? $"-vf \"scale={zoom}*iw:-1, crop = iw / {zoom}:ih / {zoom}\"" : "";
+
+                var slowMotionFilter = "";
+                var audioFilter = slowMo == 2 ? "-filter:a \"atempo=0.5\"" : "";
+                if (slowMo > 1)
+                {
+                    slowMotionFilter = $"setpts={slowMo}*PTS";
+                }
+
+
+                var zoomFilter = zoom > 1 ? $"scale={zoom}*iw:-1, crop = iw / {zoom}:ih / {zoom}" : "";
+
+
+                var delim = zoom > 1 && slowMo > 1 ? "," : "";
+
+                var videoFilter = $"-vf \"{zoomFilter} {delim} {slowMotionFilter}\"";
+
+                if (zoom == 1 && slowMo == 1)
+                {
+                    videoFilter = "";
+                }
 
 
                 var process = new Process
@@ -35,7 +57,7 @@ namespace ShadowClip.services
                         CreateNoWindow = true,
                         FileName = @"ffmpeg.exe",
                         Arguments =
-                            $"-nostdin -i \"{originalFile}\" -c:v h264_nvenc -ss {start} -t {duration} {filter}   -global_quality:v 29 -movflags faststart -f mp4 -y \"{outputFile}\""
+                            $"-nostdin -i \"{originalFile}\" -c:v h264_nvenc -ss {start} -t {duration} {videoFilter} {audioFilter}  -global_quality:v 29 -movflags faststart -f mp4 -y \"{outputFile}\""
                     }
                 };
 

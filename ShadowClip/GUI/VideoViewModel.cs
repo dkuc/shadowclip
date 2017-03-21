@@ -29,6 +29,8 @@ namespace ShadowClip.GUI
 
         public int Zoom { get; set; } = 1;
 
+        public int SlowMo { get; set; } = 1;
+
         public MediaElement VideoPlayer => _videoView.Video;
 
         public MediaState CurrentMediaState => VideoPlayer.GetMediaState();
@@ -61,6 +63,11 @@ namespace ShadowClip.GUI
             VideoPlayer.Source = new Uri(message.File.FullName);
             VideoPlayer.Play();
             SetPostion(TimeSpan.Zero);
+        }
+
+        public void OnSlowMoChanged()
+        {
+            VideoPlayer.SpeedRatio = 1 / (double) SlowMo;
         }
 
         public void MarkStart()
@@ -114,7 +121,7 @@ namespace ShadowClip.GUI
         {
             if (_currentFile != null)
                 _dialogBuilder.BuildDialog<UploadClipViewModel>(new UploadData(_currentFile, StartPosition.TotalSeconds,
-                    EndPosition.TotalSeconds, Zoom));
+                    EndPosition.TotalSeconds, Zoom, SlowMo));
         }
 
         public void GoToNextFrame()
@@ -181,7 +188,7 @@ namespace ShadowClip.GUI
                     TogglePlay();
                 }
             };
-            
+
             onMouseLostFocus = (sender, args) =>
             {
                 Mouse.Capture(null);

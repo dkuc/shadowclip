@@ -16,8 +16,10 @@
         <StackPanel>
             <TextBlock Text="{Binding OriginalFile.Name}" />
             <StackPanel Orientation="Horizontal">
-                <TextBlock Text="{Binding StartTime, StringFormat=Start: {0}s  }" Margin="20,0" />
-                <TextBlock Text="{Binding EndTime, StringFormat=End: {0}s  }" />
+                <TextBlock Text="{Binding StartTime, StringFormat={}Start: {0:#,#.00}s}" Margin="20,0" />
+                <TextBlock Text="{Binding EndTime, StringFormat={}End: {0:#,#.00}s}" Margin="5,0" />
+                <TextBlock Text="{Binding Zoom, StringFormat=Zoom: {0}x}" Margin="5,0"  />
+                <TextBlock Text="{Binding SlowMo, StringFormat=SlowMo: {0}x}" Margin="5,0"  />
             </StackPanel>
             <StackPanel Orientation="Horizontal">
                 <TextBlock Text="Encoder: " />
