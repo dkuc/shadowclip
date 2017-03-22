@@ -216,7 +216,7 @@ namespace ShadowClip.GUI
 
         public void Screenshot()
         {
-            var screenShot = VideoPlayer.GetScreenShot();
+            var screenShot = VideoPlayer.GetScreenShot(Zoom);
 
             Clipboard.SetImage(screenShot);
         }

@@ -21,7 +21,7 @@ namespace ShadowClip.GUI
             return state;
         }
 
-        public static BitmapSource GetScreenShot(this MediaElement source)
+        public static BitmapSource GetScreenShot(this MediaElement source, int zoom)
         {
             var scale = source.NaturalVideoHeight / source.RenderSize.Height;
 
@@ -43,7 +43,14 @@ namespace ShadowClip.GUI
                     new Point(actualWidth, actualHeight)));
             }
             renderTarget.Render(drawingVisual);
-            return renderTarget;
+            var zoomedBitmap = new TransformedBitmap(renderTarget, new ScaleTransform(zoom, zoom));
+            var croppedBitmap = new CroppedBitmap(zoomedBitmap, new Int32Rect(
+                (int) (zoomedBitmap.Width / 2 -  renderWidth / 2),
+                (int) (zoomedBitmap.Height / 2 -  renderHeight / 2),
+                (int) renderWidth,
+                (int) renderHeight
+                ));
+            return croppedBitmap;
         }
     }
 }
