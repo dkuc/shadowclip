@@ -1,4 +1,5 @@
-﻿* Left/Right Arrow keeys more consistently advance/reced frame
+﻿* Reset preview bar on video load
+* Left/Right Arrow keeys more consistently advance/reced frame
 * Files are opened within subdirectories of chosen path
 * Screenshot honors zoom
 * Added video slow motion (ffmpeg only)
