@@ -156,6 +156,7 @@ namespace ShadowClip.GUI
         [SuppressMessage("ReSharper", "AccessToModifiedClosure")]
         public void VideoClicked(MouseButtonEventArgs eventArgs)
         {
+            _videoView.VideoSlider.Focus();
             var firstPostition = eventArgs.GetPosition(_videoView).X;
             var previousPosition = firstPostition;
             var lastUpdate = DateTime.Now;

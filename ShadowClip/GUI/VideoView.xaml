@@ -14,7 +14,7 @@
         <gui:DurationMarginConverter x:Key="DurationMarginConverter" />
         <gui:VideoZoomConverter x:Key="VideoZoomConverter" />
     </UserControl.Resources>
-    <Grid>
+    <Grid cal:Message.Attach="[Event PreviewKeyDown] = [Action KeyPressed($eventArgs)]">
         <Grid.RowDefinitions>
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
@@ -95,7 +95,7 @@
                         <TextBlock Text="Preview" HorizontalAlignment="Center" VerticalAlignment="Bottom" />
                     </Border>
                     <Slider Grid.Row="0" Grid.Column="1" Name="VideoSlider" VerticalAlignment="Top"
-                            cal:Message.Attach="[Event PreviewKeyDown] = [Action KeyPressed($eventArgs)];
+                            cal:Message.Attach="
                             [Event PreviewMouseDown] = [Action SliderClicked()];
                             [Event PreviewMouseUp] = [Action SliderReleased()]"
                             Maximum="{Binding Duration, Converter={StaticResource MaxLength}}"
