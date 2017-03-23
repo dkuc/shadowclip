@@ -1,4 +1,7 @@
-﻿* Added video slow motion (ffmpeg only)
+﻿* Left/Right Arrow keeys more consistently advance/reced frame
+* Files are opened within subdirectories of chosen path
+* Screenshot honors zoom
+* Added video slow motion (ffmpeg only)
 * Improve ffmpeg encode quality
 * Zoom Applies to encoded video
 * Fix zoom drop down getting stuck
