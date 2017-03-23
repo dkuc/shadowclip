@@ -105,6 +105,7 @@ namespace ShadowClip.GUI
 
         private void VideoPlayerOnMediaOpened(object sender, RoutedEventArgs routedEventArgs)
         {
+            StartPosition = TimeSpan.Zero;
             EndPosition = VideoPlayer.NaturalDuration.TimeSpan;
         }
 
