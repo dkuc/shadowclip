@@ -57,7 +57,7 @@ namespace ShadowClip.services
                         CreateNoWindow = true,
                         FileName = @"ffmpeg.exe",
                         Arguments =
-                            $"-nostdin -i \"{originalFile}\" -c:v h264_nvenc -ss {start} -t {duration} {videoFilter} {audioFilter}  -global_quality:v 29 -movflags faststart -f mp4 -y \"{outputFile}\""
+                            $"-nostdin -i \"{originalFile}\" -c:v h264_nvenc -ss {start} -t {duration} {videoFilter} {audioFilter}  -global_quality:v 33 -movflags faststart -f mp4 -y \"{outputFile}\""
                     }
                 };
 
