@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
@@ -14,7 +15,7 @@ namespace ShadowClip.GUI
         private readonly IEventAggregator _eventAggregator;
         private readonly BindableCollection<FileInfo> _files = new BindableCollection<FileInfo>();
         private readonly ISettings _settings;
-        private readonly FileSystemWatcher _watcher = new FileSystemWatcher();
+        private readonly List<FileSystemWatcher> _watchers = new List<FileSystemWatcher>();
 
         public FileSelectViewModel(EventAggregator eventAggregator, ISettings settings)
         {
@@ -57,18 +58,22 @@ namespace ShadowClip.GUI
                 ErrorMessage = "Click Browse to open a directory";
             else
                 LoadPath();
-
-            _watcher.Created += (sender, args) => LoadPath();
-            _watcher.Renamed += (sender, args) => LoadPath();
-            _watcher.Deleted += (sender, args) => LoadPath();
         }
 
         private void LoadPath()
         {
+            ClearWatchers();
             ErrorMessage = "";
             try
             {
-                var filesOnDisk = new DirectoryInfo(Path).GetFiles();
+                var topLevelDirectory = new DirectoryInfo(Path);
+
+                var subDirectories = topLevelDirectory.GetDirectories();
+
+                var allDirectories = subDirectories.Concat(new[] {topLevelDirectory});
+
+                var filesOnDisk = allDirectories.SelectMany(dir => dir.GetFiles());
+
                 var newFiles =
                     filesOnDisk.Where(info => _files.All(fileInfo => fileInfo.FullName != info.FullName)).ToList();
                 var deletedFiles =
@@ -79,13 +84,37 @@ namespace ShadowClip.GUI
                 foreach (var addedFile in newFiles)
                     _files.Add(addedFile);
 
-                _watcher.Path = Path;
-                _watcher.EnableRaisingEvents = true;
+                _watchers.AddRange(allDirectories.Select(info => new FileSystemWatcher(info.FullName)));
+
+                foreach (var watcher in _watchers)
+                {
+                    watcher.Created += OnFileWatchEvent;
+                    watcher.Renamed += OnFileWatchEvent;
+                    watcher.Deleted += OnFileWatchEvent;
+                    watcher.EnableRaisingEvents = true;
+                }
             }
             catch
             {
                 ErrorMessage = "Cannot open path";
             }
+        }
+
+        private void OnFileWatchEvent(object sender, FileSystemEventArgs args)
+        {
+            LoadPath();
+        }
+
+        private void ClearWatchers()
+        {
+            foreach (var watcher in _watchers)
+            {
+                watcher.Created -= OnFileWatchEvent;
+                watcher.Renamed -= OnFileWatchEvent;
+                watcher.Deleted -= OnFileWatchEvent;
+                watcher.EnableRaisingEvents = false;
+            }
+            _watchers.Clear();
         }
 
         private void PropertyUpdated(object sender, PropertyChangedEventArgs propertyChangedEventArgs)
