@@ -72,7 +72,7 @@ namespace ShadowClip.GUI
 
                 var allDirectories = subDirectories.Concat(new[] {topLevelDirectory});
 
-                var filesOnDisk = allDirectories.SelectMany(dir => dir.GetFiles());
+                var filesOnDisk = allDirectories.SelectMany(dir => dir.GetFiles("*.mp4"));
 
                 var newFiles =
                     filesOnDisk.Where(info => _files.All(fileInfo => fileInfo.FullName != info.FullName)).ToList();
