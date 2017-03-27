@@ -1,4 +1,5 @@
-﻿* Filter out non-mp4 files.
+﻿* Fix publisher name
+* Filter out non-mp4 files.
 * Reset preview bar on video load
 * Left/Right Arrow keeys more consistently advance/reced frame
 * Files are opened within subdirectories of chosen path
