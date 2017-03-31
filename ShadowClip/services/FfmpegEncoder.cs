@@ -29,9 +29,7 @@ namespace ShadowClip.services
                 var slowMotionFilter = "";
                 var audioFilter = slowMo == 2 ? "-filter:a \"atempo=0.5\"" : "";
                 if (slowMo > 1)
-                {
                     slowMotionFilter = $"setpts={slowMo}*PTS";
-                }
 
 
                 var zoomFilter = zoom > 1 ? $"scale={zoom}*iw:-1, crop = iw / {zoom}:ih / {zoom}" : "";
@@ -42,9 +40,7 @@ namespace ShadowClip.services
                 var videoFilter = $"-vf \"{zoomFilter} {delim} {slowMotionFilter}\"";
 
                 if (zoom == 1 && slowMo == 1)
-                {
                     videoFilter = "";
-                }
 
 
                 var process = new Process

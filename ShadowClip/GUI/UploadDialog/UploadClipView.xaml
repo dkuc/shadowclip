@@ -18,15 +18,15 @@
             <StackPanel Orientation="Horizontal">
                 <TextBlock Text="{Binding StartTime, StringFormat={}Start: {0:#,#.00}s}" Margin="20,0" />
                 <TextBlock Text="{Binding EndTime, StringFormat={}End: {0:#,#.00}s}" Margin="5,0" />
-                <TextBlock Text="{Binding Zoom, StringFormat=Zoom: {0}x}" Margin="5,0"  />
-                <TextBlock Text="{Binding SlowMo, StringFormat=SlowMo: {0}x}" Margin="5,0"  />
+                <TextBlock Text="{Binding Zoom, StringFormat=Zoom: {0}x}" Margin="5,0" />
+                <TextBlock Text="{Binding SlowMo, StringFormat=SlowMo: {0}x}" Margin="5,0" />
             </StackPanel>
             <StackPanel Orientation="Horizontal">
                 <TextBlock Text="Encoder: " />
-                <RadioButton Content="Handbrake (cpu)" IsChecked="True" 
+                <RadioButton Content="Handbrake (cpu)" IsChecked="True"
                              IsEnabled="{Binding CurrentState,Converter={StaticResource StateToBoolConverter},ConverterParameter='ready,error'}" />
                 <RadioButton Content="FFMPEG (gpu)" IsChecked="{Binding UseFfmpeg}"
-                             IsEnabled="{Binding CurrentState,Converter={StaticResource StateToBoolConverter},ConverterParameter='ready,error'}"/>
+                             IsEnabled="{Binding CurrentState,Converter={StaticResource StateToBoolConverter},ConverterParameter='ready,error'}" />
             </StackPanel>
 
 

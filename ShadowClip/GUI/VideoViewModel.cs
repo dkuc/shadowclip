@@ -186,9 +186,7 @@ namespace ShadowClip.GUI
                 // ReSharper disable once AssignNullToNotNullAttribute
                 Mouse.RemoveLostMouseCaptureHandler(_videoView, onMouseLostFocus);
                 if (Math.Abs(previousPosition - firstPostition) < .001)
-                {
                     TogglePlay();
-                }
             };
 
             onMouseLostFocus = (sender, args) =>

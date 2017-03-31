@@ -126,24 +126,12 @@
     <Compile Include="GUI\Converters.cs" />
     <Compile Include="GUI\Events.cs" />
     <Compile Include="GUI\ExtensionMethods.cs" />
-    <Compile Include="GUI\FileSelectView.xaml.cs">
-      <DependentUpon>FileSelectView.xaml</DependentUpon>
-    </Compile>
     <Compile Include="GUI\FileSelectViewModel.cs" />
     <Compile Include="GUI\IDialogBuilder.cs" />
     <Compile Include="GUI\Settings.cs" />
     <Compile Include="GUI\ShellViewModel.cs" />
-    <Compile Include="GUI\StatusView.xaml.cs">
-      <DependentUpon>StatusView.xaml</DependentUpon>
-    </Compile>
     <Compile Include="GUI\StatusViewModel.cs" />
-    <Compile Include="GUI\UploadDialog\UploadClipView.xaml.cs">
-      <DependentUpon>UploadClipView.xaml</DependentUpon>
-    </Compile>
     <Compile Include="GUI\UploadDialog\UploadClipViewModel.cs" />
-    <Compile Include="GUI\VideoView.xaml.cs">
-      <DependentUpon>VideoView.xaml</DependentUpon>
-    </Compile>
     <Compile Include="GUI\VideoViewModel.cs" />
     <Compile Include="services\ClipCreator.cs" />
     <Compile Include="services\FfmpegEncoder.cs" />
@@ -160,15 +148,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Compile Include="GUI\App.xaml.cs">
-      <DependentUpon>App.xaml</DependentUpon>
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="AppBootstrapper.cs" />
-    <Compile Include="GUI\ShellView.xaml.cs">
-      <DependentUpon>ShellView.xaml</DependentUpon>
-      <SubType>Code</SubType>
-    </Compile>
     <Page Include="GUI\StatusView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

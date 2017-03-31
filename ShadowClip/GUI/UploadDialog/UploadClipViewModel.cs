@@ -138,7 +138,6 @@ namespace ShadowClip.GUI.UploadDialog
             }
         }
 
-       
 
         public void Cancel()
         {

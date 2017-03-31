@@ -6,7 +6,8 @@ namespace ShadowClip.services
 {
     public interface IEncoder
     {
-        Task Encode(string originalFile, string outputFile, double start, double end, int zoom, int slowMo, IProgress<EncodeProgress> encodeProgresss, CancellationToken cancelToken);
+        Task Encode(string originalFile, string outputFile, double start, double end, int zoom, int slowMo,
+            IProgress<EncodeProgress> encodeProgresss, CancellationToken cancelToken);
     }
 
     public class EncodeProgress

@@ -17,7 +17,9 @@ namespace ShadowClip.services
             _uploader = uploader;
         }
 
-        public async Task ClipAndUpload(string originalFile, string clipName, double start, double end, int zoom, int slowMo, bool useFfmpeg, IProgress<EncodeProgress> encodeProgress, IProgress<UploadProgress> uploadProgress, CancellationToken cancelToken)
+        public async Task ClipAndUpload(string originalFile, string clipName, double start, double end, int zoom,
+            int slowMo, bool useFfmpeg, IProgress<EncodeProgress> encodeProgress,
+            IProgress<UploadProgress> uploadProgress, CancellationToken cancelToken)
         {
             var encoder = useFfmpeg
                 ? (IEncoder) _container.Resolve<FfmpegEncoder>()

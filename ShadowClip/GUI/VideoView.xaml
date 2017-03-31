@@ -62,7 +62,7 @@
                     </Grid.ColumnDefinitions>
                     <StackPanel>
                         <Button Content="{Binding CurrentMediaState, Converter={StaticResource PlayActionCoverter}}"
-                            Name="TogglePlay" MinWidth="40" />
+                                Name="TogglePlay" MinWidth="40" />
                         <StackPanel Orientation="Horizontal">
                             <TextBlock Text="SlowMo:" />
                             <ComboBox SelectedValuePath="Tag" SelectedValue="{Binding SlowMo}">
@@ -71,7 +71,7 @@
                                 <ComboBoxItem Tag="4">4x</ComboBoxItem>
                             </ComboBox>
                         </StackPanel>
-                        
+
                     </StackPanel>
                     <Border Grid.Column="1" Height="40" BorderThickness="2" Background="LightGreen"
                             cal:Message.Attach="[Event PreviewMouseUp] = [Action PreviewClicked()]">

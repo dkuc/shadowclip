@@ -45,11 +45,11 @@ namespace ShadowClip.GUI
             renderTarget.Render(drawingVisual);
             var zoomedBitmap = new TransformedBitmap(renderTarget, new ScaleTransform(zoom, zoom));
             var croppedBitmap = new CroppedBitmap(zoomedBitmap, new Int32Rect(
-                (int) (zoomedBitmap.Width / 2 -  renderWidth / 2),
-                (int) (zoomedBitmap.Height / 2 -  renderHeight / 2),
+                (int) (zoomedBitmap.Width / 2 - renderWidth / 2),
+                (int) (zoomedBitmap.Height / 2 - renderHeight / 2),
                 (int) renderWidth,
                 (int) renderHeight
-                ));
+            ));
             return croppedBitmap;
         }
     }
