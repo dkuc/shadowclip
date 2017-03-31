@@ -79,10 +79,10 @@
     <ApplicationIcon>Shaunkleyn-Phlat-Blue-Folders-Movies.ico</ApplicationIcon>
   </PropertyGroup>
   <PropertyGroup>
-    <ManifestCertificateThumbprint>42A3D830F70BA5BBAD2DED9FED66A65CB5798CBD</ManifestCertificateThumbprint>
+    <ManifestCertificateThumbprint>F358B11517C55DBAB2CBA7E3415D1CDB855AB8B1</ManifestCertificateThumbprint>
   </PropertyGroup>
   <PropertyGroup>
-    <ManifestKeyFile>ShadowClip_TemporaryKey.pfx</ManifestKeyFile>
+    <ManifestKeyFile>ShadowClip_1_TemporaryKey.pfx</ManifestKeyFile>
   </PropertyGroup>
   <PropertyGroup>
     <GenerateManifests>true</GenerateManifests>
@@ -173,6 +173,7 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
     <None Include="scripts\after_publish.bat" />
+    <None Include="ShadowClip_1_TemporaryKey.pfx" />
     <None Include="ShadowClip_TemporaryKey.pfx" />
     <Resource Include="Shaunkleyn-Phlat-Blue-Folders-Movies.ico" />
     <EmbeddedResource Include="Properties\Resources.resx">
@@ -191,6 +192,9 @@
   <ItemGroup>
     <PackageReference Include="Caliburn.Micro">
       <Version>3.0.3</Version>
+    </PackageReference>
+    <PackageReference Include="OpenCvSharp3-AnyCPU">
+      <Version>3.2.0.20170324</Version>
     </PackageReference>
     <PackageReference Include="PropertyChanged.Fody">
       <Version>1.52.1</Version>

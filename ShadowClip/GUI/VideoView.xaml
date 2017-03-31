@@ -167,9 +167,11 @@
                                MinWidth="30" />
                 </StackPanel>
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                    <Button Content="Upload Clip" Name="Upload" />
-                    <Button Content="Copy Screenshot" Name="Screenshot" />
+                    <Button Content="Upload Clip" x:Name="Upload" />
+                    <Button Content="Copy Screenshot" x:Name="Screenshot" />
                 </StackPanel>
+                <Label Content="Is Scope Frame?" HorizontalAlignment="Left" Width="98"/>
+                <TextBox x:Name="NonZero" Height="23" TextWrapping="Wrap" Text="{Binding IsScopeFrame}" HorizontalAlignment="Right" Width="188"/>
             </StackPanel>
 
 

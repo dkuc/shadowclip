@@ -10,6 +10,10 @@ using Caliburn.Micro;
 using ShadowClip.GUI.UploadDialog;
 using ShadowClip.services;
 
+using OpenCvSharp;
+using OpenCvSharp.ML;
+using System.Windows.Media.Imaging;
+
 namespace ShadowClip.GUI
 {
     public sealed class VideoViewModel : Screen, IHandle<FileSelected>
@@ -39,6 +43,8 @@ namespace ShadowClip.GUI
         public IEnumerable<double> ShotTimes { get; set; }
 
         public bool IsFindingShots { get; set; }
+
+        public string IsScopeFrame { get; set; } = "false";
 
         public MediaElement VideoPlayer => _videoView.Video;
 
@@ -250,6 +256,45 @@ namespace ShadowClip.GUI
             var screenShot = VideoPlayer.GetScreenShot(Zoom);
 
             Clipboard.SetImage(screenShot);
+            using (var fileStream = new FileStream("temp.png", FileMode.Create))
+            {
+                BitmapEncoder encoder = new PngBitmapEncoder();
+                encoder.Frames.Add(BitmapFrame.Create(screenShot));
+                encoder.Save(fileStream);
+            }
+
+            Mat train = new Mat("temp.png", ImreadModes.GrayScale);
+            Cv2.Threshold(train, train, 16, 255, ThresholdTypes.Binary);
+            CircleSegment[] circles;
+            Mat dst = new Mat();
+            Cv2.GaussianBlur(train, dst, new OpenCvSharp.Size(5, 5), 0.5, 0.5);
+            int whitePixels = train.CountNonZero();
+            int totalPixels = 1440 * 1080; //TODO: get the real source video size
+            int blackPixels = totalPixels - whitePixels;
+            int threshold = 200000;
+            int maxThreshold = totalPixels - 150000;
+
+            if (blackPixels > threshold && blackPixels < maxThreshold)
+            {
+                IsScopeFrame = "true";
+            } else
+            {
+                IsScopeFrame = "false";
+            }
+
+            // Note, the minimum distance between concentric circles is 25. Otherwise
+            // false circles are detected as a result of the circle's thickness.
+            circles = Cv2.HoughCircles(dst, HoughMethods.Gradient, 1, 5000, 100, 70, 250, 10000);
+
+            for (int i = 0; i < circles.Length; i++)
+            {
+                Cv2.Circle(dst, circles[i].Center, (int)circles[i].Radius, new Scalar(200), 2);
+            }
+
+            using (new OpenCvSharp.Window("Circles", dst))
+            {
+                Cv2.WaitKey();
+            }
         }
 
         public void PreviewClicked()
