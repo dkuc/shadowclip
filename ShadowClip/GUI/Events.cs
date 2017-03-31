@@ -11,4 +11,14 @@ namespace ShadowClip.GUI
 
         public FileInfo File { get; }
     }
+
+    public class RequestFileDelete
+    {
+        public RequestFileDelete(FileInfo file)
+        {
+            File = file;
+        }
+
+        public FileInfo File { get; }
+    }
 }

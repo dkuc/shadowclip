@@ -60,6 +60,11 @@ namespace ShadowClip.GUI
         public void Handle(FileSelected message)
         {
             _currentFile = message.File;
+            if (message.File == null)
+            {
+                VideoPlayer.Source = null;
+                return;
+            }
             VideoPlayer.Source = new Uri(message.File.FullName);
             VideoPlayer.Play();
             SetPostion(TimeSpan.Zero);

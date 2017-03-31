@@ -40,12 +40,14 @@ namespace ShadowClip.GUI.UploadDialog
     {
         private readonly IClipCreator _clipCreator;
         private readonly ISettings _settings;
+        private readonly IEventAggregator _eventAggregator;
         private CancellationTokenSource _cancelToken;
 
-        public UploadClipViewModel(IClipCreator clipCreator, UploadData data, ISettings settings)
+        public UploadClipViewModel(IClipCreator clipCreator, ISettings settings, IEventAggregator eventAggregator ,UploadData data)
         {
             _clipCreator = clipCreator;
             _settings = settings;
+            _eventAggregator = eventAggregator;
             OriginalFile = data.OriginalFile;
             StartTime = data.StartTime;
             EndTime = data.EndTime;
@@ -121,14 +123,8 @@ namespace ShadowClip.GUI.UploadDialog
                     }), _cancelToken.Token);
                 CurrentState = State.Done;
                 if (DeleteOnSuccess)
-                    try
-                    {
-                        File.Delete(OriginalFile.FullName);
-                    }
-                    catch
-                    {
-                        // ignored
-                    }
+                    _eventAggregator.PublishOnCurrentThread(new RequestFileDelete(OriginalFile));
+
             }
             catch (Exception e)
             {

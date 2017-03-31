@@ -10,7 +10,7 @@ using Screen = Caliburn.Micro.Screen;
 
 namespace ShadowClip.GUI
 {
-    public sealed class FileSelectViewModel : Screen
+    public sealed class FileSelectViewModel : Screen, IHandle<RequestFileDelete>
     {
         private readonly IEventAggregator _eventAggregator;
         private readonly BindableCollection<FileInfo> _files = new BindableCollection<FileInfo>();
@@ -21,10 +21,10 @@ namespace ShadowClip.GUI
         {
             _eventAggregator = eventAggregator;
             _settings = settings;
-            PropertyChanged += PropertyUpdated;
             Path = _settings.ShadowplayPath;
             Files = CollectionViewSource.GetDefaultView(_files);
             Files.SortDescriptions.Add(new SortDescription("CreationTime", ListSortDirection.Descending));
+            _eventAggregator.Subscribe(this);
         }
 
 
@@ -51,6 +51,18 @@ namespace ShadowClip.GUI
         public FileInfo SelectedFile { get; set; }
 
         public string ErrorMessage { get; set; }
+
+        public void Handle(RequestFileDelete message)
+        {
+            try
+            {
+                DeleteAndUnselect(message.File);
+            }
+            catch
+            {
+                // ignored
+            }
+        }
 
         protected override void OnViewLoaded(object view)
         {
@@ -88,10 +100,10 @@ namespace ShadowClip.GUI
 
                 foreach (var watcher in _watchers)
                 {
+                    watcher.EnableRaisingEvents = true;
                     watcher.Created += OnFileWatchEvent;
                     watcher.Renamed += OnFileWatchEvent;
                     watcher.Deleted += OnFileWatchEvent;
-                    watcher.EnableRaisingEvents = true;
                 }
             }
             catch
@@ -117,11 +129,9 @@ namespace ShadowClip.GUI
             _watchers.Clear();
         }
 
-        private void PropertyUpdated(object sender, PropertyChangedEventArgs propertyChangedEventArgs)
+        public void OnSelectedFileChanged()
         {
-            if (propertyChangedEventArgs.PropertyName == "SelectedFile")
-                if (SelectedFile != null)
-                    _eventAggregator.PublishOnCurrentThread(new FileSelected(SelectedFile));
+            _eventAggregator.PublishOnCurrentThread(new FileSelected(SelectedFile));
         }
 
         public void Browse()
@@ -143,15 +153,21 @@ namespace ShadowClip.GUI
                 var dialogResult = MessageBox.Show("Are you sure you want to delete this?", "Delete File",
                     MessageBoxButtons.OKCancel);
                 if (dialogResult == DialogResult.OK)
-                {
-                    file.Delete();
-                    _files.Remove(file);
-                }
+                    DeleteAndUnselect(file);
             }
             catch (Exception e)
             {
                 MessageBox.Show("It didn't work: " + e.Message);
             }
+        }
+
+        private void DeleteAndUnselect(FileInfo file)
+        {
+            if (file == SelectedFile)
+                SelectedFile = null;
+
+            file.Delete();
+            _files.Remove(file);
         }
     }
 }
