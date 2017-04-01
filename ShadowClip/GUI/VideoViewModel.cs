@@ -269,7 +269,7 @@ namespace ShadowClip.GUI
             Mat dst = new Mat();
             Cv2.GaussianBlur(train, dst, new OpenCvSharp.Size(5, 5), 0.5, 0.5);
             int whitePixels = train.CountNonZero();
-            int totalPixels = 1440 * 1080; //TODO: get the real source video size
+            int totalPixels = VideoPlayer.NaturalVideoHeight * VideoPlayer.NaturalVideoWidth;
             int blackPixels = totalPixels - whitePixels;
             int threshold = 200000;
             int maxThreshold = totalPixels - 150000;
