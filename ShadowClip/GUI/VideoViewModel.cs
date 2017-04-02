@@ -265,30 +265,25 @@ namespace ShadowClip.GUI
 
             Mat train = new Mat("temp.png", ImreadModes.GrayScale);
             Cv2.Threshold(train, train, 16, 255, ThresholdTypes.Binary);
-            CircleSegment[] circles;
             Mat dst = new Mat();
             Cv2.GaussianBlur(train, dst, new OpenCvSharp.Size(5, 5), 0.5, 0.5);
-            int whitePixels = train.CountNonZero();
-            int totalPixels = VideoPlayer.NaturalVideoHeight * VideoPlayer.NaturalVideoWidth;
-            int blackPixels = totalPixels - whitePixels;
-            int threshold = 200000;
-            int maxThreshold = totalPixels - 150000;
 
-            if (blackPixels > threshold && blackPixels < maxThreshold)
+            double width = System.Convert.ToDouble(VideoPlayer.NaturalVideoWidth);
+            double height = System.Convert.ToDouble(VideoPlayer.NaturalVideoHeight);
+            double totalPixels = width * height;
+            double whitePixels = System.Convert.ToDouble(train.CountNonZero());
+            double blackPixels = totalPixels - whitePixels;
+            double minPercent = 0.45;
+            double maxPercent = 0.9;
+            double minBlackPixels = totalPixels * minPercent;
+            double maxBlackPixels = totalPixels * maxPercent;
+
+            if (blackPixels > minBlackPixels && blackPixels < maxBlackPixels)
             {
                 IsScopeFrame = "true";
             } else
             {
                 IsScopeFrame = "false";
-            }
-
-            // Note, the minimum distance between concentric circles is 25. Otherwise
-            // false circles are detected as a result of the circle's thickness.
-            circles = Cv2.HoughCircles(dst, HoughMethods.Gradient, 1, 5000, 100, 70, 250, 10000);
-
-            for (int i = 0; i < circles.Length; i++)
-            {
-                Cv2.Circle(dst, circles[i].Center, (int)circles[i].Radius, new Scalar(200), 2);
             }
 
             using (new OpenCvSharp.Window("Circles", dst))
