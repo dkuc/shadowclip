@@ -1,5 +1,4 @@
 using System;
-using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Windows;
@@ -30,6 +29,8 @@ namespace ShadowClip.GUI
         public int Zoom { get; set; } = 1;
 
         public int SlowMo { get; set; } = 1;
+
+        public bool IsMuted { get; set; }
 
         public MediaElement VideoPlayer => _videoView.Video;
 
@@ -70,6 +71,11 @@ namespace ShadowClip.GUI
             SetPostion(TimeSpan.Zero);
         }
 
+        public void OnIsMutedChanged()
+        {
+            _settings.IsMuted = IsMuted;
+        }
+
         public void OnSlowMoChanged()
         {
             VideoPlayer.SpeedRatio = 1 / (double) SlowMo;
@@ -98,10 +104,7 @@ namespace ShadowClip.GUI
             _videoView = (VideoView) view;
             VideoPlayer.MediaOpened += VideoPlayerOnMediaOpened;
 
-            VideoPlayer.IsMuted = _settings.IsMuted;
-            DependencyPropertyDescriptor
-                .FromProperty(MediaElement.IsMutedProperty, typeof(MediaElement))
-                .AddValueChanged(VideoPlayer, (s, e) => { _settings.IsMuted = VideoPlayer.IsMuted; });
+            IsMuted = _settings.IsMuted;
 
             var timer = new DispatcherTimer {Interval = TimeSpan.FromSeconds(1)};
             timer.Tick += (sender, args) => NotifyOfPropertyChange("");
@@ -111,7 +114,8 @@ namespace ShadowClip.GUI
         private void VideoPlayerOnMediaOpened(object sender, RoutedEventArgs routedEventArgs)
         {
             StartPosition = TimeSpan.Zero;
-            EndPosition = VideoPlayer.NaturalDuration.TimeSpan;
+            var duration = VideoPlayer.NaturalDuration;
+            EndPosition = duration.HasTimeSpan ? duration.TimeSpan : TimeSpan.Zero;
         }
 
         public void TogglePlay()

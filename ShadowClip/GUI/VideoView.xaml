@@ -27,7 +27,7 @@
                           ClipToBounds="True"
                           Height="{Binding ElementName=VideoCanvas, Path=ActualHeight}"
                           Width="{Binding ElementName=VideoCanvas, Path=ActualWidth}"
-
+                          IsMuted="{Binding IsMuted}"
                           cal:Message.Attach="[Event MouseDown] = [Action VideoClicked($eventArgs)];">
 
                 <MediaElement.RenderTransform>
@@ -106,7 +106,7 @@
                             <TextBlock Text="{Binding Position, StringFormat=mm\\:ss}" />
                             <TextBlock Text=" / " />
                             <TextBlock Text="{Binding Duration, StringFormat=mm\\:ss}" />
-                            <CheckBox Content="Muted" IsChecked="{Binding VideoPlayer.IsMuted}" />
+                            <CheckBox Content="Muted" IsChecked="{Binding IsMuted}" />
                         </StackPanel>
                         <StackPanel Orientation="Horizontal">
                             <TextBlock Text="Zoom:" />
