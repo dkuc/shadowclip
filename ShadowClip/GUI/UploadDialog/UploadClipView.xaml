@@ -23,9 +23,9 @@
             </StackPanel>
             <StackPanel Orientation="Horizontal">
                 <TextBlock Text="Encoder: " />
-                <RadioButton Content="Handbrake (cpu)" IsChecked="True"
+                <RadioButton Content="CPU " IsChecked="True"
                              IsEnabled="{Binding CurrentState,Converter={StaticResource StateToBoolConverter},ConverterParameter='ready,error'}" />
-                <RadioButton Content="FFMPEG (gpu)" IsChecked="{Binding UseFfmpeg}"
+                <RadioButton Content="GPU" IsChecked="{Binding UseFfmpeg}"
                              IsEnabled="{Binding CurrentState,Converter={StaticResource StateToBoolConverter},ConverterParameter='ready,error'}" />
             </StackPanel>
 

@@ -7,7 +7,7 @@ namespace ShadowClip.services
     public interface IClipCreator
     {
         Task ClipAndUpload(string originalFile, string clipName, double start, double end, int zoom, int slowMo,
-            bool useFfmpeg, IProgress<EncodeProgress> encodeProgress, IProgress<UploadProgress> uploadProgress,
+            bool useGpu, IProgress<EncodeProgress> encodeProgress, IProgress<UploadProgress> uploadProgress,
             CancellationToken cancelToken);
     }
 }

@@ -10,7 +10,7 @@ namespace ShadowClip.services
     public class FfmpegEncoder : IEncoder
     {
         public Task Encode(string originalFile, string outputFile, double start, double end, int zoom, int slowMo,
-            IProgress<EncodeProgress> encodeProgresss, CancellationToken cancelToken)
+            bool useGpu, IProgress<EncodeProgress> encodeProgresss, CancellationToken cancelToken)
         {
             var taskCompletionSource = new TaskCompletionSource<bool>();
             var lastOutput = "";
@@ -42,6 +42,7 @@ namespace ShadowClip.services
                 if (zoom == 1 && slowMo == 1)
                     videoFilter = "";
 
+                var encoder = useGpu ? "h264_nvenc" : "libx264 ";
 
                 var process = new Process
                 {
@@ -53,7 +54,7 @@ namespace ShadowClip.services
                         CreateNoWindow = true,
                         FileName = @"ffmpeg.exe",
                         Arguments =
-                            $"-nostdin -i \"{originalFile}\" -c:v h264_nvenc -ss {start} -t {duration} {videoFilter} {audioFilter}  -global_quality:v 33 -movflags faststart -f mp4 -y \"{outputFile}\""
+                            $"-nostdin -i \"{originalFile}\" -c:v {encoder} -ss {start} -t {duration} {videoFilter} {audioFilter}  -global_quality:v 33 -movflags faststart -f mp4 -y \"{outputFile}\""
                     }
                 };
 

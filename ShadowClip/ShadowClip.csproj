@@ -135,7 +135,6 @@
     <Compile Include="GUI\VideoViewModel.cs" />
     <Compile Include="services\ClipCreator.cs" />
     <Compile Include="services\FfmpegEncoder.cs" />
-    <Compile Include="services\HandbrakeEncoder.cs" />
     <Compile Include="services\IClipCreator.cs" />
     <Compile Include="services\IEncoder.cs" />
     <Compile Include="services\IUploader.cs" />
@@ -187,9 +186,7 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-    <None Include="dependencies\Newtonsoft.Json.dll" />
     <Resource Include="FodyWeavers.xml" />
-    <EmbeddedResource Include="handbrake_settings.json" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -226,10 +223,6 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="release_notes.txt">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <None Include="dependencies\HandBrake.ApplicationServices.dll" />
-    <Content Include="hb.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>

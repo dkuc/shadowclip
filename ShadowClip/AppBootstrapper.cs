@@ -5,6 +5,7 @@ using System.Windows;
 using Caliburn.Micro;
 using Microsoft.Practices.Unity;
 using ShadowClip.GUI;
+using ShadowClip.services;
 
 namespace ShadowClip
 {
@@ -31,6 +32,7 @@ namespace ShadowClip
                 Singleton<IWindowManager, WindowManager>();
                 Singleton<IEventAggregator, EventAggregator>();
                 Singleton<ISettings, Settings>();
+                PerResolve<IEncoder, FfmpegEncoder>();
             }
         }
 
@@ -67,9 +69,9 @@ namespace ShadowClip
             _container.RegisterType<TFrom>(new ContainerControlledLifetimeManager());
         }
 
-        private void PerResolve<T>()
+        private void PerResolve<TFrom, TTo>() where TTo : TFrom
         {
-            _container.RegisterType<T>(new PerResolveLifetimeManager());
+            _container.RegisterType<TFrom, TTo>(new PerResolveLifetimeManager());
         }
     }
 }
