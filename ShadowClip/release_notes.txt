@@ -1,4 +1,6 @@
-﻿* Fix file delete on upload not updating the file list
+﻿* Fix crash on very short videos
+* Remove Handbrake engine (zoom and slowmo now work with cpu encoding)
+* Fix file delete on upload not updating the file list
 * Fix publisher name
 * Filter out non-mp4 files.
 * Reset preview bar on video load
