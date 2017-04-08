@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Windows;
@@ -64,6 +65,40 @@ namespace ShadowClip.GUI
             var endOffset = end.TotalSeconds / duration.TotalSeconds * width;
 
             return new Thickness(startOffset, 0, width - endOffset, 0);
+        }
+
+        public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    public class ShotTime
+    {
+        public double Time { get; set; }
+        public Thickness Margin { get; set; }
+    }
+    internal class ShotTimesConverter : IMultiValueConverter
+    {
+        public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
+        {
+            var none = Enumerable.Empty<ShotTime>();
+            if (!(values[0] is IEnumerable<double> times)) return none;
+            if (!(values[1] is TimeSpan duration)) return none;
+            if (!(values[2] is double width)) return none;
+            if (duration.Ticks == 0) return none;
+
+            return times.Select(time =>
+            {
+                var fraction = time / duration.TotalSeconds;
+                var offset = fraction * width - 4;
+                
+                return new ShotTime
+                {
+                    Margin = new Thickness(offset, 0, 0, 0),
+                    Time = time
+                };
+            });
         }
 
         public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)

@@ -130,6 +130,7 @@
     <Compile Include="services\IClipCreator.cs" />
     <Compile Include="services\IEncoder.cs" />
     <Compile Include="services\IUploader.cs" />
+    <Compile Include="services\ShotFinder.cs" />
     <Compile Include="services\Uploader.cs" />
     <Page Include="GUI\FileSelectView.xaml">
       <SubType>Designer</SubType>

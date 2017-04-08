@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Windows;
@@ -7,22 +8,25 @@ using System.Windows.Input;
 using System.Windows.Threading;
 using Caliburn.Micro;
 using ShadowClip.GUI.UploadDialog;
+using ShadowClip.services;
 
 namespace ShadowClip.GUI
 {
     public sealed class VideoViewModel : Screen, IHandle<FileSelected>
     {
         private readonly IDialogBuilder _dialogBuilder;
+        private readonly IShotFinder _shotFinder;
         private readonly TimeSpan _frameTime = TimeSpan.FromTicks(166667);
         private readonly ISettings _settings;
         private FileInfo _currentFile;
         private bool _playingWhileClicked;
         private VideoView _videoView;
 
-        public VideoViewModel(IEventAggregator eventAggregator, ISettings settings, IDialogBuilder dialogBuilder)
+        public VideoViewModel(IEventAggregator eventAggregator, ISettings settings, IDialogBuilder dialogBuilder, IShotFinder shotFinder)
         {
             _settings = settings;
             _dialogBuilder = dialogBuilder;
+            _shotFinder = shotFinder;
             eventAggregator.Subscribe(this);
         }
 
@@ -31,6 +35,10 @@ namespace ShadowClip.GUI
         public int SlowMo { get; set; } = 1;
 
         public bool IsMuted { get; set; }
+
+        public IEnumerable<double> ShotTimes { get; set; }
+
+        public bool IsFindingShots { get; set; }
 
         public MediaElement VideoPlayer => _videoView.Video;
 
@@ -69,6 +77,15 @@ namespace ShadowClip.GUI
             VideoPlayer.Source = new Uri(message.File.FullName);
             VideoPlayer.Play();
             SetPostion(TimeSpan.Zero);
+            ShotTimes = new double[0];
+            FindShotTimesAsync();
+        }
+
+        private async void FindShotTimesAsync()
+        {
+            IsFindingShots = true;
+            ShotTimes = await _shotFinder.GetShotTimes(VideoPlayer.Source.AbsolutePath);
+            IsFindingShots = false;
         }
 
         public void OnIsMutedChanged()
@@ -89,6 +106,11 @@ namespace ShadowClip.GUI
         public void MarkEnd()
         {
             EndPosition = Position;
+        }
+
+        public void GoTo(ShotTime shotTime)
+        {
+            CurrentPosition = shotTime.Time;
         }
 
         private void SetPostion(TimeSpan position)
