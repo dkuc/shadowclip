@@ -6,12 +6,13 @@
              xmlns:cal="http://www.caliburnproject.org"
              xmlns:gui="clr-namespace:ShadowClip.GUI"
              mc:Ignorable="d"
-             d:DesignHeight="300" d:DesignWidth="300">
+             d:DesignHeight="300" d:DesignWidth="700">
     <UserControl.Resources>
         <gui:MaxLengthConverter x:Key="MaxLength" />
         <gui:PlayActionCoverter x:Key="PlayActionCoverter" />
         <gui:IntegerSecondsConverter x:Key="IntegerSecondsConverter" />
         <gui:DurationMarginConverter x:Key="DurationMarginConverter" />
+        <gui:ShotTimesConverter x:Key="ShotTimesConverter" />
         <gui:VideoZoomConverter x:Key="VideoZoomConverter" />
     </UserControl.Resources>
     <Grid cal:Message.Attach="[Event PreviewKeyDown] = [Action KeyPressed($eventArgs)]">
@@ -71,36 +72,69 @@
                                 <ComboBoxItem Tag="4">4x</ComboBoxItem>
                             </ComboBox>
                         </StackPanel>
-
                     </StackPanel>
-                    <Border Grid.Column="1" Height="40" BorderThickness="2" Background="LightGreen"
-                            cal:Message.Attach="[Event PreviewMouseUp] = [Action PreviewClicked()]">
-                        <Border.Margin>
-                            <MultiBinding Converter="{StaticResource DurationMarginConverter}">
-                                <Binding Path="StartPosition" />
-                                <Binding Path="EndPosition" />
-                                <Binding Path="Duration" />
-                                <Binding Path="ActualWidth" ElementName="VideoSlider" />
-                            </MultiBinding>
-                        </Border.Margin>
-                        <Border.Style>
-                            <Style TargetType="Border">
-                                <Style.Triggers>
-                                    <Trigger Property="IsMouseOver" Value="True">
-                                        <Setter Property="BorderBrush" Value="Black" />
-                                    </Trigger>
-                                </Style.Triggers>
-                            </Style>
-                        </Border.Style>
-                        <TextBlock Text="Preview" HorizontalAlignment="Center" VerticalAlignment="Bottom" />
-                    </Border>
-                    <Slider Grid.Row="0" Grid.Column="1" Name="VideoSlider" VerticalAlignment="Top"
-                            cal:Message.Attach="
+                    
+                    <StackPanel Grid.Column="1">
+                        <TextBlock Visibility="{Binding IsFindingShots, Converter={StaticResource BooleanToVisibilityConverter}}" Text="Searching video for shots..." HorizontalAlignment="Center"/>
+                        <ItemsControl>
+                            <ItemsControl.ItemsSource>
+                                <MultiBinding Converter="{StaticResource ShotTimesConverter}">
+                                    <Binding Path="ShotTimes" />
+                                    <Binding Path="Duration" />
+                                    <Binding Path="ActualWidth" ElementName="VideoSlider" />
+                                </MultiBinding>
+                            </ItemsControl.ItemsSource>
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <Grid ShowGridLines="True" />
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+
+                            <ItemsControl.ItemContainerStyle>
+                                <Style>
+                                    <Setter Property="FrameworkElement.Margin" Value="{Binding Margin}" />
+                                </Style>
+                            </ItemsControl.ItemContainerStyle>
+
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Button Height="20" Width="8" HorizontalAlignment="Left" Cursor="Hand"
+                                            cal:Message.Attach="GoTo($dataContext)" />
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                        <Grid>
+                            <Border Height="40" BorderThickness="2" Background="LightGreen"
+                                    cal:Message.Attach="[Event PreviewMouseUp] = [Action PreviewClicked()]">
+                                <Border.Margin>
+                                    <MultiBinding Converter="{StaticResource DurationMarginConverter}">
+                                        <Binding Path="StartPosition" />
+                                        <Binding Path="EndPosition" />
+                                        <Binding Path="Duration" />
+                                        <Binding Path="ActualWidth" ElementName="VideoSlider" />
+                                    </MultiBinding>
+                                </Border.Margin>
+                                <Border.Style>
+                                    <Style TargetType="Border">
+                                        <Style.Triggers>
+                                            <Trigger Property="IsMouseOver" Value="True">
+                                                <Setter Property="BorderBrush" Value="Black" />
+                                            </Trigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Border.Style>
+                                <TextBlock Text="Preview" HorizontalAlignment="Center" VerticalAlignment="Bottom" />
+                            </Border>
+                            <Slider Grid.Row="0" Name="VideoSlider" VerticalAlignment="Top"
+                                    cal:Message.Attach="
                             [Event PreviewMouseDown] = [Action SliderClicked()];
                             [Event PreviewMouseUp] = [Action SliderReleased()]"
-                            Maximum="{Binding Duration, Converter={StaticResource MaxLength}}"
-                            Value="{Binding CurrentPosition}" HorizontalAlignment="Stretch"
-                            IsMoveToPointEnabled="True" />
+                                    Maximum="{Binding Duration, Converter={StaticResource MaxLength}}"
+                                    Value="{Binding CurrentPosition}" HorizontalAlignment="Stretch"
+                                    IsMoveToPointEnabled="True" />
+                        </Grid>
+                    </StackPanel>
+
                     <StackPanel Grid.Row="0" Grid.Column="2" HorizontalAlignment="Center">
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                             <TextBlock Text="{Binding Position, StringFormat=mm\\:ss}" />
@@ -133,10 +167,13 @@
                                MinWidth="30" />
                 </StackPanel>
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                    <Button Content="Upload Clip" Name="Upload" />
-                    <Button Content="Copy Screenshot" Name="Screenshot" />
+                    <Button Content="Upload Clip" x:Name="Upload" />
+                    <Button Content="Copy Screenshot" x:Name="Screenshot" />
                 </StackPanel>
-            </StackPanel>
+                <TextBox x:Name="NonZero" Height="23" TextWrapping="Wrap" Text="{Binding IsScopeFrame}" HorizontalAlignment="Right" Width="188"/>
+                <Label Content="Is Scope Frame?" HorizontalAlignment="Left" Width="98"/>
+        <TextBox Height="71" TextWrapping="Wrap" Text="{Binding WordString}"/>
+      </StackPanel>
 
 
         </Grid>
