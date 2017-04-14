@@ -142,7 +142,7 @@ namespace ShadowClip.services
             double totalPixelsFlash = quarterWidth * quarterHeight;
             double whitePixelsFlash = Convert.ToDouble(combinedMat.CountNonZero());
 
-            return (whitePixelsFlash > (totalPixelsFlash * 0.003));
+            return (whitePixelsFlash > (totalPixelsFlash * 0.001));
         }
 
         private IEnumerable<double> ProcessVideo(string videoFilePath)
