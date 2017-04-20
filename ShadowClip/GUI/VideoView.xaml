@@ -99,7 +99,7 @@
                             [Event PreviewMouseDown] = [Action SliderClicked()];
                             [Event PreviewMouseUp] = [Action SliderReleased()]"
                             Maximum="{Binding Duration, Converter={StaticResource MaxLength}}"
-                            Value="{Binding CurrentPosition}" HorizontalAlignment="Stretch"
+                            Value="{Binding CurrentPosition, Delay=15}" HorizontalAlignment="Stretch"
                             IsMoveToPointEnabled="True" />
                     <StackPanel Grid.Row="0" Grid.Column="2" HorizontalAlignment="Center">
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
