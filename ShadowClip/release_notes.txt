@@ -1,4 +1,5 @@
-﻿* Fix crash on very short videos
+﻿* Make slider bar more responsive.
+* Fix crash on very short videos
 * Remove Handbrake engine (zoom and slowmo now work with cpu encoding)
 * Fix file delete on upload not updating the file list
 * Fix publisher name
