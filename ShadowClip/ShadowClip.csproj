@@ -114,6 +114,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="services\Segment.cs" />
+    <Compile Include="GUI\Controls\SegmentControl.xaml.cs">
+      <DependentUpon>SegmentControl.xaml</DependentUpon>
+    </Compile>
     <Compile Include="GUI\UpdateViewModel.cs" />
     <Compile Include="GUI\Converters.cs" />
     <Compile Include="GUI\Events.cs" />
@@ -131,6 +135,10 @@
     <Compile Include="services\IEncoder.cs" />
     <Compile Include="services\IUploader.cs" />
     <Compile Include="services\Uploader.cs" />
+    <Page Include="GUI\Controls\SegmentControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="GUI\FileSelectView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -310,6 +318,7 @@
       <FileType>Assembly</FileType>
     </PublishFile>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="CustomPostPublishActions" AfterTargets="PublishOnly">
     <Exec MSBuildArchitecture="x64" Command="scripts\after_publish.bat $(Configuration) $(Platform)" />

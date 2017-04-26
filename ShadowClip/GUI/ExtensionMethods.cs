@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using System;
+using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -8,6 +9,11 @@ namespace ShadowClip.GUI
 {
     public static class ExtensionMethods
     {
+        public static TimeSpan ToTimeSpan(this double value)
+        {
+            return TimeSpan.FromTicks((long) (value * 10_000_000));
+        }
+        
         //Nasty Hack because microsoft only allows the media state to be observed in Windows 10 Universal apps, not WPF
         public static MediaState GetMediaState(this MediaElement mediaElement)
         {

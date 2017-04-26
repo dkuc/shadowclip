@@ -1,4 +1,5 @@
 using System;
+using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Windows;
@@ -7,6 +8,7 @@ using System.Windows.Input;
 using System.Windows.Threading;
 using Caliburn.Micro;
 using ShadowClip.GUI.UploadDialog;
+using ShadowClip.services;
 
 namespace ShadowClip.GUI
 {
@@ -24,7 +26,12 @@ namespace ShadowClip.GUI
             _settings = settings;
             _dialogBuilder = dialogBuilder;
             eventAggregator.Subscribe(this);
+
+            // ReSharper disable once SuspiciousTypeConversion.Global
+            ((INotifyPropertyChanged) FirstSegment).PropertyChanged += SegmentChanged;
         }
+
+        public BindableCollection<Segment> Segments { get; } = new BindableCollection<Segment> {new Segment()};
 
         public int Zoom { get; set; } = 1;
 
@@ -38,22 +45,31 @@ namespace ShadowClip.GUI
 
         public TimeSpan Position => VideoPlayer.Position;
 
+        public Segment FirstSegment => Segments[0];
 
         public TimeSpan Duration
             => VideoPlayer.NaturalDuration.HasTimeSpan ? VideoPlayer.NaturalDuration.TimeSpan : TimeSpan.Zero;
 
-        public TimeSpan StartPosition { get; set; }
+        public TimeSpan StartPosition
+        {
+            get => FirstSegment.Start.ToTimeSpan();
+            set => FirstSegment.Start = value.TotalSeconds;
+        }
 
-        public TimeSpan EndPosition { get; set; }
+        public TimeSpan EndPosition
+        {
+            get => FirstSegment.End.ToTimeSpan();
+            set => FirstSegment.End = value.TotalSeconds;
+        }
 
         public double CurrentPosition
         {
-            get { return Position.TotalSeconds; }
+            get => Position.TotalSeconds;
 
             set
             {
                 VideoPlayer.Pause();
-                VideoPlayer.Position = TimeSpan.FromTicks((long) (value * 10_000_000));
+                VideoPlayer.Position = value.ToTimeSpan();
                 NotifyOfPropertyChange(() => Position);
             }
         }
@@ -69,6 +85,15 @@ namespace ShadowClip.GUI
             VideoPlayer.Source = new Uri(message.File.FullName);
             VideoPlayer.Play();
             SetPostion(TimeSpan.Zero);
+        }
+
+        private void SegmentChanged(object o, PropertyChangedEventArgs propertyChangedEventArgs)
+        {
+            var propertyName = propertyChangedEventArgs.PropertyName;
+            if (propertyName == "Start")
+                SetPostion(FirstSegment.Start.ToTimeSpan());
+            if (propertyName == "End")
+                SetPostion(FirstSegment.End.ToTimeSpan());
         }
 
         public void OnIsMutedChanged()
