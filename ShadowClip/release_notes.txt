@@ -1,4 +1,5 @@
-﻿* Make slider bar more responsive.
+﻿* Start and end times can now be selected via dragging.
+* Make slider bar more responsive.
 * Fix crash on very short videos
 * Remove Handbrake engine (zoom and slowmo now work with cpu encoding)
 * Fix file delete on upload not updating the file list
