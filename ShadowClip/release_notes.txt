@@ -1,4 +1,5 @@
-﻿* Start and end times can now be selected via dragging.
+﻿* Fix crash on preview bar resize
+* Start and end times can now be selected via dragging.
 * Make slider bar more responsive.
 * Fix crash on very short videos
 * Remove Handbrake engine (zoom and slowmo now work with cpu encoding)
