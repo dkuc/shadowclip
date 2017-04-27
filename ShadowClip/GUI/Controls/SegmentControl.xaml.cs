@@ -141,6 +141,7 @@ namespace ShadowClip.GUI.Controls
         private void SetColumnWidths()
         {
             var width = SegGrid.ActualWidth;
+
             var usableWidth = width - (Segments.Count + 1) * SplitWidth;
 
             var starColumns = SegGrid.ColumnDefinitions.Where(definition => definition.Width.IsStar).ToList();
@@ -186,7 +187,20 @@ namespace ShadowClip.GUI.Controls
 
         private void SegGrid_SizeChanged(object sender, SizeChangedEventArgs e)
         {
+#if DEBUG
             Init();
+#endif
+#if !DEBUG
+            try
+            {
+                Init();
+            }
+            catch (Exception exception)
+            {
+                //This should never happen
+                Console.WriteLine(exception);
+            }
+#endif
         }
     }
 }
