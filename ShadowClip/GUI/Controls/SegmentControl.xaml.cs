@@ -143,6 +143,10 @@ namespace ShadowClip.GUI.Controls
             var width = SegGrid.ActualWidth;
 
             var usableWidth = width - (Segments.Count + 1) * SplitWidth;
+            if (usableWidth < 1)
+                return;
+            if (Segments.Last().End > Duration)
+                return;
 
             var starColumns = SegGrid.ColumnDefinitions.Where(definition => definition.Width.IsStar).ToList();
 
@@ -167,13 +171,13 @@ namespace ShadowClip.GUI.Controls
             if (_newSegments)
                 return;
 
-            _newWidths = true;
             var width = SegGrid.ActualWidth;
             var usableWidth = width - (Segments.Count + 1) * SplitWidth;
+            if (usableWidth < 1)
+                return;
 
+            _newWidths = true;
             var starColumns = SegGrid.ColumnDefinitions.Where(definition => definition.Width.IsStar).ToList();
-
-
             var index = 0;
             foreach (var segment in Segments)
             {
@@ -187,20 +191,7 @@ namespace ShadowClip.GUI.Controls
 
         private void SegGrid_SizeChanged(object sender, SizeChangedEventArgs e)
         {
-#if DEBUG
             Init();
-#endif
-#if !DEBUG
-            try
-            {
-                Init();
-            }
-            catch (Exception exception)
-            {
-                //This should never happen
-                Console.WriteLine(exception);
-            }
-#endif
         }
     }
 }
