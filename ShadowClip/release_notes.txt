@@ -1,4 +1,7 @@
-﻿* Fix crash on preview bar resize
+﻿* Fixed several crashes
+* Added YouTube video Uploading
+* Added ability to save videos to file (saves to your shadow clip directory)
+* Fix crash on preview bar resize
 * Start and end times can now be selected via dragging.
 * Make slider bar more responsive.
 * Fix crash on very short videos
