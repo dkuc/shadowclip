@@ -22,38 +22,38 @@ namespace ShadowClip.GUI
 
         public double Top
         {
-            get { return _settings.Top; }
-            set { _settings.Top = value; }
+            get => _settings.Top;
+            set => _settings.Top = value;
         }
 
         public double Left
         {
-            get { return _settings.Left; }
-            set { _settings.Left = value; }
+            get => _settings.Left;
+            set => _settings.Left = value;
         }
 
         public double Height
         {
-            get { return _settings.Height; }
-            set { _settings.Height = value; }
+            get => _settings.Height;
+            set => _settings.Height = value;
         }
 
         public double Width
         {
-            get { return _settings.Width; }
-            set { _settings.Width = value; }
+            get => _settings.Width;
+            set => _settings.Width = value;
         }
 
         public WindowState Maximized
         {
-            get { return _settings.Maximized ? WindowState.Maximized : WindowState.Normal; }
-            set { _settings.Maximized = value == WindowState.Maximized; }
+            get => _settings.Maximized ? WindowState.Maximized : WindowState.Normal;
+            set => _settings.Maximized = value == WindowState.Maximized;
         }
 
         public GridLength FilePanelWidth
         {
-            get { return new GridLength(_settings.FilePanelWidth); }
-            set { _settings.FilePanelWidth = value.Value; }
+            get => new GridLength(_settings.FilePanelWidth);
+            set => _settings.FilePanelWidth = value.Value;
         }
 
         public VideoViewModel VideoViewModel { get; }

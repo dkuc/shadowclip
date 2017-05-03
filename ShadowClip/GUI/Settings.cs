@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Windows.Navigation;
 using ShadowClip.services;
 
 namespace ShadowClip.GUI

@@ -30,20 +30,20 @@ namespace ShadowClip.GUI
 
         public bool ShowPreviews
         {
-            get { return _settings.ShowPreviews; }
-            set { _settings.ShowPreviews = value; }
+            get => _settings.ShowPreviews;
+            set => _settings.ShowPreviews = value;
         }
 
         public bool ShowFileNames
         {
-            get { return _settings.ShowFileNames; }
-            set { _settings.ShowFileNames = value; }
+            get => _settings.ShowFileNames;
+            set => _settings.ShowFileNames = value;
         }
 
         public string Path
         {
-            get { return _settings.ShadowplayPath; }
-            set { _settings.ShadowplayPath = value; }
+            get => _settings.ShadowplayPath;
+            set => _settings.ShadowplayPath = value;
         }
 
         public ICollectionView Files { get; }

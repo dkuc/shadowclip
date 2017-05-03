@@ -123,7 +123,7 @@ namespace ShadowClip.GUI.UploadDialog
                 CurrentState = State.Working;
                 ErrorText = "";
                 _cancelToken = new CancellationTokenSource();
-                YouTubeId =  await _clipCreator.ClipAndUpload(OriginalFile.FullName, $"{SafeFileName}.mp4",
+                YouTubeId = await _clipCreator.ClipAndUpload(OriginalFile.FullName, $"{SafeFileName}.mp4",
                     StartTime,
                     EndTime,
                     Zoom,
@@ -195,6 +195,7 @@ namespace ShadowClip.GUI.UploadDialog
         {
             _settings.UseFfmpeg = UseFfmpeg;
         }
+
         public void OnSelectedDestinationChanged()
         {
             _settings.Destination = SelectedDestination;
