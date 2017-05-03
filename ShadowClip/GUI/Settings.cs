@@ -1,4 +1,8 @@
-﻿namespace ShadowClip.GUI
+﻿using System;
+using System.Windows.Navigation;
+using ShadowClip.services;
+
+namespace ShadowClip.GUI
 {
     internal class Settings : ISettings
     {
@@ -6,62 +10,62 @@
 
         public bool Maximized
         {
-            get { return _settings.Maximized; }
-            set { _settings.Maximized = value; }
+            get => _settings.Maximized;
+            set => _settings.Maximized = value;
         }
 
         public double Width
         {
-            get { return _settings.Width; }
-            set { _settings.Width = value; }
+            get => _settings.Width;
+            set => _settings.Width = value;
         }
 
         public double Height
         {
-            get { return _settings.Height; }
-            set { _settings.Height = value; }
+            get => _settings.Height;
+            set => _settings.Height = value;
         }
 
         public double Left
         {
-            get { return _settings.Left; }
-            set { _settings.Left = value; }
+            get => _settings.Left;
+            set => _settings.Left = value;
         }
 
         public double Top
         {
-            get { return _settings.Top; }
-            set { _settings.Top = value; }
+            get => _settings.Top;
+            set => _settings.Top = value;
         }
 
         public double FilePanelWidth
         {
-            get { return _settings.FilePanelWidth; }
-            set { _settings.FilePanelWidth = value; }
+            get => _settings.FilePanelWidth;
+            set => _settings.FilePanelWidth = value;
         }
 
         public bool ShowFileNames
         {
-            get { return _settings.ShowFileNames; }
-            set { _settings.ShowFileNames = value; }
+            get => _settings.ShowFileNames;
+            set => _settings.ShowFileNames = value;
         }
 
         public bool ShowPreviews
         {
-            get { return _settings.ShowPreviews; }
-            set { _settings.ShowPreviews = value; }
+            get => _settings.ShowPreviews;
+            set => _settings.ShowPreviews = value;
         }
 
         public string ShadowplayPath
         {
-            get { return _settings.ShadowplayPath; }
-            set { _settings.ShadowplayPath = value; }
+            get => _settings.ShadowplayPath;
+            set => _settings.ShadowplayPath = value;
         }
 
         public bool IsMuted
         {
-            get { return _settings.IsMuted; }
-            set { _settings.IsMuted = value; }
+            get => _settings.IsMuted;
+            set => _settings.IsMuted = value;
         }
 
         public void Save()
@@ -71,8 +75,18 @@
 
         public bool UseFfmpeg
         {
-            get { return _settings.UseFfmpeg; }
-            set { _settings.UseFfmpeg = value; }
+            get => _settings.UseFfmpeg;
+            set => _settings.UseFfmpeg = value;
+        }
+
+        public Destination Destination
+        {
+            get
+            {
+                Enum.TryParse(_settings.Destination, out Destination destination);
+                return destination;
+            }
+            set => _settings.Destination = value.ToString();
         }
     }
 
@@ -89,6 +103,7 @@
         double Left { get; set; }
         double Top { get; set; }
         bool UseFfmpeg { get; set; }
+        Destination Destination { get; set; }
         void Save();
     }
 }

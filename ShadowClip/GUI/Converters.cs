@@ -5,6 +5,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using ShadowClip.GUI.UploadDialog;
+using ShadowClip.services;
 
 namespace ShadowClip.GUI
 {
@@ -89,6 +90,14 @@ namespace ShadowClip.GUI
         public override object Convert(TimeSpan duration)
         {
             return duration.TotalSeconds;
+        }
+    }
+
+    internal class DestinationToVisibilityConverter : SimpleConverter<Destination>
+    {
+        public override object Convert(Destination duration)
+        {
+            return duration == Destination.File ? Visibility.Collapsed : Visibility.Visible;
         }
     }
 

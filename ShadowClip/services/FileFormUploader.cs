@@ -8,9 +8,9 @@ using System.Threading.Tasks;
 
 namespace ShadowClip.services
 {
-    public class Uploader : IUploader
+    public class FileFormUploader : IUploader
     {
-        public async Task UploadFile(string filePath, string name, IProgress<UploadProgress> uploadProgress,
+        public async Task<string> UploadFile(string filePath, string name, IProgress<UploadProgress> uploadProgress,
             CancellationToken cancelToken)
         {
             using (var file = File.OpenRead(filePath))
@@ -31,6 +31,7 @@ namespace ShadowClip.services
                 var response = await httpClient.PostAsync("https://dankuc.com/up", form, cancelToken);
 
                 response.EnsureSuccessStatusCode();
+                return "";
             }
         }
 

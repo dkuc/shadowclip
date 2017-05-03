@@ -6,7 +6,7 @@ namespace ShadowClip.services
 {
     public interface IUploader
     {
-        Task UploadFile(string filePath, string name, IProgress<UploadProgress> uploadProgress,
+        Task<string> UploadFile(string filePath, string name, IProgress<UploadProgress> uploadProgress,
             CancellationToken cancelToken);
     }
 

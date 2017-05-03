@@ -11,6 +11,7 @@
     <UserControl.Resources>
         <gui:StateToBoolConverter x:Key="StateToBoolConverter" />
         <gui:BitRateConverter x:Key="BitRateConverter" />
+        <gui:DestinationToVisibilityConverter x:Key="DestinationToVisibilityConverter" />
     </UserControl.Resources>
     <Grid>
         <StackPanel>
@@ -27,6 +28,10 @@
                              IsEnabled="{Binding CurrentState,Converter={StaticResource StateToBoolConverter},ConverterParameter='ready,error'}" />
                 <RadioButton Content="GPU" IsChecked="{Binding UseFfmpeg}"
                              IsEnabled="{Binding CurrentState,Converter={StaticResource StateToBoolConverter},ConverterParameter='ready,error'}" />
+            </StackPanel>
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Text="Destination: " />
+                <ComboBox ItemsSource="{Binding Destinations}" SelectedValue="{Binding SelectedDestination}" />
             </StackPanel>
 
 
@@ -58,9 +63,12 @@
                              Value="{Binding EncodeProgress}" />
                 <TextBlock Grid.Row="0" Grid.Column="2"
                            Text="{Binding EncodeFps, StringFormat=' {0} FPS'}" />
-                <TextBlock Grid.Row="1" Grid.Column="0" Text="Upload:" />
-                <ProgressBar Grid.Row="1" Grid.Column="1" Height="15" Value="{Binding UploadProgress}" />
+                <TextBlock Grid.Row="1" Grid.Column="0" Text="Upload:"
+                           Visibility="{Binding SelectedDestination, Converter={StaticResource DestinationToVisibilityConverter}}" />
+                <ProgressBar Grid.Row="1" Grid.Column="1" Height="15" Value="{Binding UploadProgress}"
+                             Visibility="{Binding SelectedDestination, Converter={StaticResource DestinationToVisibilityConverter}}" />
                 <TextBlock Grid.Row="1" Grid.Column="2"
+                           Visibility="{Binding SelectedDestination, Converter={StaticResource DestinationToVisibilityConverter}}"
                            Text="{Binding UploadRate, Converter={StaticResource BitRateConverter}}" />
             </Grid>
             <TextBlock Text="{Binding CurrentState, StringFormat=State: {0}}" />

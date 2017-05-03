@@ -39,11 +39,12 @@ namespace ShadowClip.GUI.UploadDialog
     public sealed class UploadClipViewModel : Screen
     {
         private readonly IClipCreator _clipCreator;
-        private readonly ISettings _settings;
         private readonly IEventAggregator _eventAggregator;
+        private readonly ISettings _settings;
         private CancellationTokenSource _cancelToken;
 
-        public UploadClipViewModel(IClipCreator clipCreator, ISettings settings, IEventAggregator eventAggregator ,UploadData data)
+        public UploadClipViewModel(IClipCreator clipCreator, ISettings settings, IEventAggregator eventAggregator,
+            UploadData data)
         {
             _clipCreator = clipCreator;
             _settings = settings;
@@ -87,8 +88,25 @@ namespace ShadowClip.GUI.UploadDialog
         public bool UseFfmpeg { get; set; }
 
         public string ErrorText { get; set; }
+        public string YouTubeId { get; set; } = "";
 
-        public string Url => $"https://dankuc.com/videos/{Uri.EscapeUriString(SafeFileName)}";
+        public string Url => BuildUrl(SelectedDestination, SafeFileName);
+
+        public Destination SelectedDestination { get; set; }
+        public Array Destinations => Enum.GetValues(typeof(Destination));
+
+        private string BuildUrl(Destination destination, string fileName)
+        {
+            switch (destination)
+            {
+                case Destination.DanSite:
+                    return $"https://dankuc.com/videos/{Uri.EscapeUriString(fileName)}";
+                case Destination.File:
+                    return $"{Path.Combine(_settings.ShadowplayPath, fileName)}.mp4";
+                default:
+                    return $"https://www.youtube.com/watch?v={YouTubeId}";
+            }
+        }
 
 
         public async void StartUpload()
@@ -105,12 +123,13 @@ namespace ShadowClip.GUI.UploadDialog
                 CurrentState = State.Working;
                 ErrorText = "";
                 _cancelToken = new CancellationTokenSource();
-                await _clipCreator.ClipAndUpload(OriginalFile.FullName, $"{SafeFileName}.mp4",
+                YouTubeId =  await _clipCreator.ClipAndUpload(OriginalFile.FullName, $"{SafeFileName}.mp4",
                     StartTime,
                     EndTime,
                     Zoom,
                     SlowMo,
                     UseFfmpeg,
+                    SelectedDestination,
                     new Progress<EncodeProgress>(ep =>
                     {
                         EncodeProgress = ep.PercentComplete;
@@ -124,13 +143,16 @@ namespace ShadowClip.GUI.UploadDialog
                 CurrentState = State.Done;
                 if (DeleteOnSuccess)
                     _eventAggregator.PublishOnCurrentThread(new RequestFileDelete(OriginalFile));
-
             }
             catch (Exception e)
             {
                 CurrentState = State.Error;
                 Console.Write(e);
                 ErrorText = $"Error: {e.Message}";
+            }
+            finally
+            {
+                _cancelToken = null;
             }
         }
 
@@ -142,8 +164,15 @@ namespace ShadowClip.GUI.UploadDialog
 
         public void OnUrlClick(MouseButtonEventArgs e)
         {
-            if (e.ChangedButton == MouseButton.Left)
-                Process.Start(Url);
+            try
+            {
+                if (e.ChangedButton == MouseButton.Left)
+                    Process.Start(Url);
+            }
+            catch
+            {
+                // ignored
+            }
         }
 
         public void Copy()
@@ -159,11 +188,16 @@ namespace ShadowClip.GUI.UploadDialog
         protected override void OnActivate()
         {
             UseFfmpeg = _settings.UseFfmpeg;
+            SelectedDestination = _settings.Destination;
         }
 
         public void OnUseFfmpegChanged()
         {
             _settings.UseFfmpeg = UseFfmpeg;
+        }
+        public void OnSelectedDestinationChanged()
+        {
+            _settings.Destination = SelectedDestination;
         }
     }
 }
