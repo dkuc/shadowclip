@@ -31,7 +31,8 @@
             </StackPanel>
             <StackPanel Orientation="Horizontal">
                 <TextBlock Text="Destination: " />
-                <ComboBox ItemsSource="{Binding Destinations}" SelectedValue="{Binding SelectedDestination}" />
+                <ComboBox ItemsSource="{Binding Destinations}" SelectedValue="{Binding SelectedDestination}"
+                          IsEnabled="{Binding CurrentState,Converter={StaticResource StateToBoolConverter},ConverterParameter='ready,error'}" />
             </StackPanel>
 
 
