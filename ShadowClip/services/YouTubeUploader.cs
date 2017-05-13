@@ -49,7 +49,7 @@ namespace ShadowClip.services
                         Description = name,
                         CategoryId = "22"
                     },
-                    Status = new VideoStatus {PrivacyStatus = "unlisted"}
+                    Status = new VideoStatus {PrivacyStatus = "public"}
                 };
 
                 using (var fileStream = new FileStream(filePath, FileMode.Open))
