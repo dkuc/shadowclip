@@ -1,4 +1,5 @@
-﻿* YouTube uploads are now public
+﻿* Fix first video load always skipping to end.
+* YouTube uploads are now public
 * Fixed several crashes
 * Added YouTube video Uploading
 * Added ability to save videos to file (saves to your shadow clip directory)
