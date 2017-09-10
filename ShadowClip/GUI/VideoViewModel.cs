@@ -141,6 +141,7 @@ namespace ShadowClip.GUI
             StartPosition = TimeSpan.Zero;
             var duration = VideoPlayer.NaturalDuration;
             EndPosition = duration.HasTimeSpan ? duration.TimeSpan : TimeSpan.Zero;
+            CurrentPosition = 0;
         }
 
         public void TogglePlay()
