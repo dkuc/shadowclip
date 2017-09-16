@@ -12,20 +12,18 @@ namespace ShadowClip.GUI.UploadDialog
 {
     public class UploadData
     {
-        public UploadData(FileInfo originalFile, double startTime, double endTime, int zoom, int slowMo)
+ 
+
+        public UploadData(FileInfo originalFile, BindableCollection<Segment> segments)
         {
             OriginalFile = originalFile;
-            StartTime = startTime;
-            EndTime = endTime;
-            Zoom = zoom;
-            SlowMo = slowMo;
+            Segments = segments;
         }
 
+        public BindableCollection<Segment> Segments { get; }
+
         public FileInfo OriginalFile { get; }
-        public double StartTime { get; }
-        public double EndTime { get; }
-        public int Zoom { get; }
-        public int SlowMo { get; }
+
     }
 
     public enum State
@@ -50,17 +48,16 @@ namespace ShadowClip.GUI.UploadDialog
             _settings = settings;
             _eventAggregator = eventAggregator;
             OriginalFile = data.OriginalFile;
-            StartTime = data.StartTime;
-            EndTime = data.EndTime;
-            Zoom = data.Zoom;
-            SlowMo = data.SlowMo;
+            Segments = data.Segments;
             FileName = "";
             DisplayName = "Uploader";
         }
 
-        public int SlowMo { get; set; }
+        public BindableCollection<Segment> Segments { get;}
 
-        public int Zoom { get; }
+        public decimal Speed => Segments.First().Speed;
+
+        public int Zoom => Segments.First().Zoom;
 
         public State CurrentState { get; set; }
 
@@ -73,8 +70,8 @@ namespace ShadowClip.GUI.UploadDialog
                 .Concat(new[] {' '})
                 .ToArray()));
 
-        public double StartTime { get; }
-        public double EndTime { get; }
+        public double StartTime => Segments.First().Start;
+        public double EndTime => Segments.Last().End;
 
         public bool CurrentlyUploading { get; set; }
         public bool CurrentlyEncoding { get; set; }
@@ -124,10 +121,7 @@ namespace ShadowClip.GUI.UploadDialog
                 ErrorText = "";
                 _cancelToken = new CancellationTokenSource();
                 YouTubeId = await _clipCreator.ClipAndUpload(OriginalFile.FullName, $"{SafeFileName}.mp4",
-                    StartTime,
-                    EndTime,
-                    Zoom,
-                    SlowMo,
+                    Segments,
                     UseFfmpeg,
                     SelectedDestination,
                     new Progress<EncodeProgress>(ep =>

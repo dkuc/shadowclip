@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
@@ -28,15 +29,13 @@ namespace ShadowClip.services
             _settings = settings;
         }
 
-        public async Task<string> ClipAndUpload(string originalFile, string clipName, double start, double end,
-            int zoom,
-            int slowMo, bool useGpu, Destination destination, IProgress<EncodeProgress> encodeProgress,
-            IProgress<UploadProgress> uploadProgress, CancellationToken cancelToken)
+        public async Task<string> ClipAndUpload(string originalFile, string clipName, IEnumerable<Segment> segments, bool useGpu,
+            Destination destination, Progress<EncodeProgress> encodeProgress, Progress<UploadProgress> uploadProgress, CancellationToken cancelToken)
         {
             var outputFile = Path.GetTempFileName();
             try
             {
-                await _encoder.Encode(originalFile, outputFile, start, end, zoom, slowMo, useGpu, encodeProgress,
+                await _encoder.Encode(originalFile, outputFile, segments, useGpu, encodeProgress,
                     cancelToken);
                 if (destination == Destination.File)
                 {
@@ -63,5 +62,6 @@ namespace ShadowClip.services
                     }
             }
         }
+
     }
 }

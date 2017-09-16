@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -6,8 +7,7 @@ namespace ShadowClip.services
 {
     public interface IEncoder
     {
-        Task Encode(string originalFile, string outputFile, double start, double end, int zoom, int slowMo, bool useGpu,
-            IProgress<EncodeProgress> encodeProgresss, CancellationToken cancelToken);
+        Task Encode(string originalFile, string outputFile, IEnumerable<Segment> segments, bool useGpu, IProgress<EncodeProgress> encodeProgress, CancellationToken cancelToken);
     }
 
     public class EncodeProgress

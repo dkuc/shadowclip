@@ -1,12 +1,17 @@
 using System;
+using System.Collections.Specialized;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Threading;
 using Caliburn.Micro;
+using ShadowClip.GUI.Controls;
 using ShadowClip.GUI.UploadDialog;
 using ShadowClip.services;
 
@@ -14,11 +19,17 @@ namespace ShadowClip.GUI
 {
     public sealed class VideoViewModel : Screen, IHandle<FileSelected>
     {
+        private const long MinUpdateTime = 32;
         private readonly IDialogBuilder _dialogBuilder;
         private readonly TimeSpan _frameTime = TimeSpan.FromTicks(166667);
         private readonly ISettings _settings;
+        private readonly Stopwatch _stopwatch = new Stopwatch();
         private FileInfo _currentFile;
+        private TimeSpan _newestPosition;
         private bool _playingWhileClicked;
+        private DispatcherTimer _previewTimer;
+        private long _previousTimeSet;
+        private Task _setTask;
         private VideoView _videoView;
 
         public VideoViewModel(IEventAggregator eventAggregator, ISettings settings, IDialogBuilder dialogBuilder)
@@ -27,15 +38,24 @@ namespace ShadowClip.GUI
             _dialogBuilder = dialogBuilder;
             eventAggregator.Subscribe(this);
 
-            // ReSharper disable once SuspiciousTypeConversion.Global
-            ((INotifyPropertyChanged) FirstSegment).PropertyChanged += SegmentChanged;
+            Segments.CollectionChanged += SegmentsOnCollectionChanged;
+            Segments.Add(new Segment {Start = 0, End = 60, Speed = 1, Zoom = 1});
+            _stopwatch.Start();
         }
 
-        public BindableCollection<Segment> Segments { get; } = new BindableCollection<Segment> {new Segment()};
+        public BindableCollection<Segment> Segments { get; set; } = new BindableCollection<Segment>();
 
-        public int Zoom { get; set; } = 1;
+        public int Zoom
+        {
+            get => CurrentSegment.Zoom;
+            set => CurrentSegment.Zoom = value;
+        }
 
-        public int SlowMo { get; set; } = 1;
+        public decimal Speed
+        {
+            get => CurrentSegment.Speed;
+            set => CurrentSegment.Speed = value;
+        }
 
         public bool IsMuted { get; set; }
 
@@ -45,10 +65,30 @@ namespace ShadowClip.GUI
 
         public TimeSpan Position => VideoPlayer.Position;
 
-        public Segment FirstSegment => Segments[0];
+        public Segment FirstSegment => Segments.First();
+        public Segment FinalSegment => Segments.Last();
 
-        public TimeSpan Duration
-            => VideoPlayer.NaturalDuration.HasTimeSpan ? VideoPlayer.NaturalDuration.TimeSpan : TimeSpan.Zero;
+        public Segment CurrentSegment
+        {
+            get
+            {
+                if (Segments.Count == 1)
+                    return FirstSegment;
+
+                if (CurrentPosition < FirstSegment.End)
+                    return FirstSegment;
+
+                foreach (var segment in Segments)
+                    if (CurrentPosition >= segment.Start && CurrentPosition < segment.End)
+                        return segment;
+
+                return FinalSegment;
+            }
+        }
+
+        public TimeSpan Duration => VideoPlayer.NaturalDuration.HasTimeSpan
+            ? VideoPlayer.NaturalDuration.TimeSpan
+            : TimeSpan.Zero;
 
         public TimeSpan StartPosition
         {
@@ -58,7 +98,7 @@ namespace ShadowClip.GUI
 
         public TimeSpan EndPosition
         {
-            get => FirstSegment.End.ToTimeSpan();
+            get => FinalSegment.End.ToTimeSpan();
             set => FirstSegment.End = value.TotalSeconds;
         }
 
@@ -66,12 +106,7 @@ namespace ShadowClip.GUI
         {
             get => Position.TotalSeconds;
 
-            set
-            {
-                VideoPlayer.Pause();
-                VideoPlayer.Position = value.ToTimeSpan();
-                NotifyOfPropertyChange(() => Position);
-            }
+            set => SetPostion(value.ToTimeSpan());
         }
 
         public void Handle(FileSelected message)
@@ -87,13 +122,38 @@ namespace ShadowClip.GUI
             SetPostion(TimeSpan.Zero);
         }
 
+        private void SegmentsOnCollectionChanged(object o, NotifyCollectionChangedEventArgs args)
+        {
+            if (args.NewItems != null)
+                foreach (INotifyPropertyChanged newItem in args.NewItems)
+                    newItem.PropertyChanged += SegmentChanged;
+            if (args.OldItems != null)
+                foreach (INotifyPropertyChanged oldItem in args.OldItems)
+                    oldItem.PropertyChanged -= SegmentChanged;
+        }
+
+        public void AddSegment()
+        {
+            var midPoint = (FirstSegment.End - FirstSegment.Start) / 2 + FirstSegment.Start;
+            var segment = new Segment {Start = midPoint, End = FirstSegment.End, Speed = 1, Zoom = 1};
+            Segments.Insert(1, segment);
+            FirstSegment.End = segment.Start;
+        }
+
+        public void RemoveSegment()
+        {
+            if (Segments.Count > 1)
+                Segments.RemoveAt(Segments.Count - 1);
+        }
+
         private void SegmentChanged(object o, PropertyChangedEventArgs propertyChangedEventArgs)
         {
+            var segment = (Segment) o;
             var propertyName = propertyChangedEventArgs.PropertyName;
             if (propertyName == "Start")
-                SetPostion(FirstSegment.Start.ToTimeSpan());
-            if (propertyName == "End")
-                SetPostion(FirstSegment.End.ToTimeSpan());
+                SetPostion(segment.Start.ToTimeSpan());
+            if (propertyName == "End" && segment == FinalSegment)
+                SetPostion(segment.End.ToTimeSpan());
         }
 
         public void OnIsMutedChanged()
@@ -101,9 +161,9 @@ namespace ShadowClip.GUI
             _settings.IsMuted = IsMuted;
         }
 
-        public void OnSlowMoChanged()
+        public void OnSpeedChanged()
         {
-            VideoPlayer.SpeedRatio = 1 / (double) SlowMo;
+            VideoPlayer.SpeedRatio = (double) Speed;
         }
 
         public void MarkStart()
@@ -116,12 +176,26 @@ namespace ShadowClip.GUI
             EndPosition = Position;
         }
 
-        private void SetPostion(TimeSpan position)
+        private async void SetPostion(TimeSpan position)
         {
+            _newestPosition = position;
+            if (_setTask != null)
+                return;
+            var elapsedTime = _stopwatch.ElapsedMilliseconds - _previousTimeSet;
+            if (elapsedTime < MinUpdateTime)
+            {
+                _setTask = Task.Delay((int) (MinUpdateTime - elapsedTime));
+                await _setTask;
+                _setTask = null;
+            }
+
             VideoPlayer.Pause();
-            VideoPlayer.Position = position;
+            VideoPlayer.Position = _newestPosition;
             NotifyOfPropertyChange(() => CurrentMediaState);
             NotifyOfPropertyChange(() => CurrentPosition);
+            NotifyOfPropertyChange(() => Zoom);
+            NotifyOfPropertyChange(() => Speed);
+            _previousTimeSet = _stopwatch.ElapsedMilliseconds;
         }
 
         protected override void OnViewAttached(object view, object context)
@@ -131,13 +205,20 @@ namespace ShadowClip.GUI
 
             IsMuted = _settings.IsMuted;
 
-            var timer = new DispatcherTimer {Interval = TimeSpan.FromSeconds(1)};
-            timer.Tick += (sender, args) => NotifyOfPropertyChange("");
+            var timer = new DispatcherTimer {Interval = TimeSpan.FromSeconds(.5)};
+            timer.Tick += (sender, args) =>
+            {
+                NotifyOfPropertyChange("");
+                if(Speed != (decimal) VideoPlayer.SpeedRatio) OnSpeedChanged();
+
+            };
             timer.Start();
         }
 
+
         private void VideoPlayerOnMediaOpened(object sender, RoutedEventArgs routedEventArgs)
         {
+            Segments.RemoveRange(Segments.Except(new[] {FirstSegment}).ToList());
             StartPosition = TimeSpan.Zero;
             var duration = VideoPlayer.NaturalDuration;
             EndPosition = duration.HasTimeSpan ? duration.TimeSpan : TimeSpan.Zero;
@@ -156,8 +237,7 @@ namespace ShadowClip.GUI
         public void Upload()
         {
             if (_currentFile != null)
-                _dialogBuilder.BuildDialog<UploadClipViewModel>(new UploadData(_currentFile, StartPosition.TotalSeconds,
-                    EndPosition.TotalSeconds, Zoom, SlowMo));
+                _dialogBuilder.BuildDialog<UploadClipViewModel>(new UploadData(_currentFile, Segments));
         }
 
         public void GoToNextFrame()
@@ -256,21 +336,29 @@ namespace ShadowClip.GUI
             Clipboard.SetImage(screenShot);
         }
 
-        public void PreviewClicked()
+        public void PreviewClicked(SegClicked clickEvent)
         {
-            SetPostion(StartPosition);
+            var segment = clickEvent.Segment;
+            var start = segment.Start;
+            var end = segment.End;
+            SetPostion(start.ToTimeSpan());
+            OnSpeedChanged();
             VideoPlayer.Play();
 
-            var timer = new DispatcherTimer {Interval = TimeSpan.FromMilliseconds(16)};
-            timer.Tick += (sender, args) =>
+            _previewTimer?.Stop();
+            _previewTimer = new DispatcherTimer {Interval = TimeSpan.FromMilliseconds(16)};
+
+            _previewTimer.Tick += (sender, args) =>
             {
-                if (VideoPlayer.Position >= EndPosition)
+                if (CurrentMediaState != MediaState.Play)
+                    _previewTimer.Stop();
+                if (VideoPlayer.Position >= end.ToTimeSpan())
                 {
                     VideoPlayer.Pause();
-                    timer.Stop();
+                    _previewTimer.Stop();
                 }
             };
-            timer.Start();
+            _previewTimer.Start();
         }
     }
 }

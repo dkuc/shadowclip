@@ -1,6 +1,8 @@
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
@@ -9,40 +11,21 @@ namespace ShadowClip.services
 {
     public class FfmpegEncoder : IEncoder
     {
-        public Task Encode(string originalFile, string outputFile, double start, double end, int zoom, int slowMo,
+        public Task Encode(string originalFile, string outputFile, IEnumerable<Segment> segments, 
             bool useGpu, IProgress<EncodeProgress> encodeProgresss, CancellationToken cancelToken)
         {
             var taskCompletionSource = new TaskCompletionSource<bool>();
             var lastOutput = "";
-
-            start = start * slowMo;
-            end = end * slowMo;
-
-            var duration = end - start;
+            var duration = segments.Sum(segment => (segment.End - segment.Start) / (double) segment.Speed);
 
             try
             {
+                
                 if (duration <= 0)
                     throw new Exception("Invalid start and end times.");
 
 
-                var slowMotionFilter = "";
-                var audioFilter = slowMo == 2 ? "-filter:a \"atempo=0.5\"" : "";
-                if (slowMo > 1)
-                    slowMotionFilter = $"setpts={slowMo}*PTS";
-
-
-                var zoomFilter = zoom > 1 ? $"scale={zoom}*iw:-1, crop = iw / {zoom}:ih / {zoom}" : "";
-
-
-                var delim = zoom > 1 && slowMo > 1 ? "," : "";
-
-                var videoFilter = $"-vf \"{zoomFilter} {delim} {slowMotionFilter}\"";
-
-                if (zoom == 1 && slowMo == 1)
-                    videoFilter = "";
-
-                var encoder = useGpu ? "h264_nvenc" : "libx264 ";
+                
 
                 var process = new Process
                 {
@@ -53,8 +36,8 @@ namespace ShadowClip.services
                         UseShellExecute = false,
                         CreateNoWindow = true,
                         FileName = @"ffmpeg.exe",
-                        Arguments =
-                            $"-nostdin -i \"{originalFile}\" -c:v {encoder} -ss {start} -t {duration} {videoFilter} {audioFilter}  -global_quality:v 33 -movflags faststart -f mp4 -y \"{outputFile}\""
+                        Arguments = BuildFfmpegCommand()
+
                     }
                 };
 
@@ -119,6 +102,48 @@ namespace ShadowClip.services
                         }
                     }
                 }
+            }
+
+            string BuildFfmpegCommand()
+            {
+ 
+                var filter = "";
+                var index = 0;
+                var concat = "";
+                foreach (var segment in segments)
+                {
+                    index++;
+                    var hasSpeedTransform = segment.Speed != 1;
+                    var suffix = hasSpeedTransform ? "tmp" : "";
+                    var zoom = segment.Zoom;
+                    var zoomFilter = zoom > 1 ? $",scale={zoom}*iw:-1, crop = iw / {zoom}:ih / {zoom}" : "";
+                    filter +=
+                        $"[0:v]trim=start={segment.Start}:duration={segment.End - segment.Start}, setpts=PTS-STARTPTS{zoomFilter}[video{index}{suffix}];";
+                    filter +=
+                        $"[0:a]atrim=start={segment.Start}:duration={segment.End - segment.Start}, asetpts=PTS-STARTPTS[audio{index}{suffix}];";
+
+                    concat += $"[video{index}][audio{index}]";
+                    if (hasSpeedTransform)
+                    {
+                        var extraSlow = segment.Speed > 2 || segment.Speed < 0.5m;
+                        var audioSuffix = extraSlow ? "tmp2" : "";
+                        var audioSpeed = Math.Max(0.5, Math.Min(2d, (double)segment.Speed));
+                        filter += $"[video{index}tmp]setpts=PTS/{segment.Speed}[video{index}];";
+                        filter += $"[audio{index}tmp]atempo={audioSpeed}[audio{index}{audioSuffix}];";
+                        if(extraSlow)
+                            filter += $"[audio{index}tmp2]atempo={audioSpeed}[audio{index}];";
+
+                    }
+
+           
+                    
+                }
+                concat += $"concat=n={segments.Count()}:v=1:a=1[final]";
+                filter += concat;
+
+                var encoder = useGpu ? "h264_nvenc" : "libx264 ";
+                return
+                    $"-nostdin -i \"{originalFile}\" -c:v {encoder} -filter_complex \"{filter}\"  -global_quality:v 33 -movflags faststart -f mp4 -y -map [final] \"{outputFile}\"";
             }
         }
     }

@@ -3,6 +3,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Data;
 using System.Windows.Media;
 using Caliburn.Micro;
 using ShadowClip.services;
@@ -23,6 +24,7 @@ namespace ShadowClip.GUI.Controls
 
         private bool _newSegments;
         private bool _newWidths;
+        private BindableCollection<Segment> _previousSegments;
 
         public SegmentControl()
         {
@@ -66,14 +68,25 @@ namespace ShadowClip.GUI.Controls
             SegGrid.Children.Add(gridSplitter);
         }
 
-        private void AddRect()
+        private void AddRect(Segment segment)
         {
             var border = new Border
             {
-                Background = new SolidColorBrush(Colors.LightGreen),
+                //Background = new SolidColorBrush(Colors.LightGreen),
                 Child = new TextBlock {Text = "Preview"}
             };
-            border.PreviewMouseLeftButtonUp += (s, e) => { Clicked(s, e); };
+
+            Binding myBinding = new Binding
+            {
+                Source = segment,
+                Path = new PropertyPath("Speed"),
+                Mode = BindingMode.TwoWay,
+                UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged,
+                Converter = new SpeedConverter()
+            };
+            BindingOperations.SetBinding(border, Border.BackgroundProperty, myBinding);
+
+            border.PreviewMouseLeftButtonUp += (s, e) => { Clicked(s, new SegClicked(segment)); };
             SegGrid.Children.Add(border);
         }
 
@@ -86,9 +99,9 @@ namespace ShadowClip.GUI.Controls
         private void SetupElements()
         {
             AddSplitter();
-            foreach (var unused in Segments)
+            foreach (var segment in Segments)
             {
-                AddRect();
+                AddRect(segment);
                 AddSplitter();
             }
             var column = 0;
@@ -111,11 +124,13 @@ namespace ShadowClip.GUI.Controls
             AddColumn(1, GridUnitType.Star);
         }
 
-
+        
         private void Init()
         {
             // ReSharper disable once CompareOfFloatsByEqualityOperator
             if (Duration == 0)
+                return;
+            if (Segments == null)
                 return;
 
             SegGrid.ColumnDefinitions.Clear();
@@ -126,6 +141,10 @@ namespace ShadowClip.GUI.Controls
             foreach (var segment in Segments)
                 // ReSharper disable once SuspiciousTypeConversion.Global
                 ((INotifyPropertyChanged) segment).PropertyChanged += SegmentsChanged;
+            if(_previousSegments != Segments)
+                Segments.CollectionChanged += (sender, args) => Init();
+
+            _previousSegments = Segments;
         }
 
         private void SegmentsChanged(object sender, PropertyChangedEventArgs propertyChangedEventArgs)
@@ -192,6 +211,16 @@ namespace ShadowClip.GUI.Controls
         private void SegGrid_SizeChanged(object sender, SizeChangedEventArgs e)
         {
             Init();
+        }
+    }
+
+    public class SegClicked : EventArgs
+    {
+        public Segment Segment { get; }
+
+        public SegClicked(Segment segment)
+        {
+            Segment = segment;
         }
     }
 }

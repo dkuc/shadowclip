@@ -4,6 +4,7 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
+using System.Windows.Media;
 using ShadowClip.GUI.UploadDialog;
 using ShadowClip.services;
 
@@ -82,6 +83,20 @@ namespace ShadowClip.GUI
             var roundedValue = Math.Round(rate, 2, MidpointRounding.AwayFromZero);
 
             return $"{roundedValue} {ordinals[ordinal]}B/s";
+        }
+    }
+
+    internal class SpeedConverter : SimpleConverter<decimal>
+    {
+        public override object Convert(decimal speed)
+        {
+            if(speed > 1)
+                return new SolidColorBrush(Colors.LightSalmon);
+
+            if (speed < 1)
+                return new SolidColorBrush(Colors.LightBlue);
+
+            return new SolidColorBrush(Colors.LightGreen);
         }
     }
 
