@@ -24,7 +24,7 @@
     <UpdatePeriodically>false</UpdatePeriodically>
     <UpdateRequired>false</UpdateRequired>
     <MapFileExtensions>true</MapFileExtensions>
-    <InstallUrl>https://dankuc.com/shadowclip/</InstallUrl>
+    <InstallUrl>https://shadowclip.net/shadowclip/</InstallUrl>
     <ProductName>Shadow Clip</ProductName>
     <PublisherName>Shadow Clip</PublisherName>
     <CreateWebPageOnPublish>true</CreateWebPageOnPublish>

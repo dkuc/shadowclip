@@ -28,7 +28,7 @@ namespace ShadowClip.services
                 form.Add(progressableStreamContent);
 
 
-                var response = await httpClient.PostAsync("https://dankuc.com/up", form, cancelToken);
+                var response = await httpClient.PostAsync("https://shadowclip.net/up", form, cancelToken);
 
                 response.EnsureSuccessStatusCode();
                 return "";
