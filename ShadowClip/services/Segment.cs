@@ -2,7 +2,7 @@ using PropertyChanged;
 
 namespace ShadowClip.services
 {
-    [ImplementPropertyChanged]
+    [AddINotifyPropertyChangedInterface]
     public class Segment
     {
         public double Start { get; set; }
