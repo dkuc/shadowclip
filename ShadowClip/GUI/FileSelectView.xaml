@@ -3,14 +3,9 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             xmlns:local="clr-namespace:ShadowClip"
              xmlns:cal="http://www.caliburnproject.org"
-             xmlns:gui="clr-namespace:ShadowClip.GUI"
              mc:Ignorable="d"
              d:DesignHeight="300" d:DesignWidth="300">
-    <UserControl.Resources>
-        <gui:VideoSourceConverter x:Key="VideoSourceConverter" />
-    </UserControl.Resources>
     <Grid>
 
         <Grid.RowDefinitions>
@@ -26,7 +21,7 @@
             <CheckBox Content="Show Previews" IsChecked="{Binding ShowPreviews}" />
             <CheckBox Content="Show File Names" IsChecked="{Binding ShowFileNames}" />
         </StackPanel>
-        <ListBox Grid.Row="2" Name="Files" VirtualizingPanel.VirtualizationMode="Recycling"
+        <ListBox Grid.Row="2" Name="Videos" VirtualizingPanel.VirtualizationMode="Recycling"
                  VirtualizingPanel.CacheLengthUnit="Page"
                  VirtualizingPanel.CacheLength="2,2">
             <ListBox.ItemTemplate>
@@ -36,18 +31,9 @@
                                    Visibility="{Binding Path=DataContext.ShowFileNames, 
           RelativeSource={RelativeSource AncestorType={x:Type UserControl}}, Converter={StaticResource BooleanToVisibilityConverter}}" />
                         <StackPanel Orientation="Horizontal">
-                            <MediaElement LoadedBehavior="Pause" ScrubbingEnabled="True"
-                                          IsMuted="True" Height="100" MinWidth="133"
-                                          Visibility="{Binding Path=DataContext.ShowPreviews, 
-          RelativeSource={RelativeSource AncestorType={x:Type UserControl}}, Converter={StaticResource BooleanToVisibilityConverter}}">
-                                <MediaElement.Source>
-                                    <MultiBinding Converter="{StaticResource VideoSourceConverter}">
-                                        <Binding Path="FullName" />
-                                        <Binding Path="DataContext.ShowPreviews"
-                                                 RelativeSource="{RelativeSource AncestorType={x:Type UserControl}}" />
-                                    </MultiBinding>
-                                </MediaElement.Source>
-                            </MediaElement>
+                            <Image Source="{Binding Thumbnail, TargetNullValue={x:Null}}"
+                                   Visibility="{Binding Path=DataContext.ShowPreviews, 
+          RelativeSource={RelativeSource AncestorType={x:Type UserControl}}, Converter={StaticResource BooleanToVisibilityConverter}}" />
                             <TextBlock Padding="5,0,5,0" Text="{Binding CreationTime}" />
                             <Button Content="X" ToolTip="Delete" VerticalAlignment="Top" Padding="5" Margin="5"
                                     cal:Message.Attach="[Event Click] = [Action Delete($dataContext)]" />

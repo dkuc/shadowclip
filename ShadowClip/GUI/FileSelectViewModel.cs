@@ -6,6 +6,7 @@ using System.Linq;
 using System.Windows.Data;
 using System.Windows.Forms;
 using Caliburn.Micro;
+using ShadowClip.services;
 using Screen = Caliburn.Micro.Screen;
 
 namespace ShadowClip.GUI
@@ -13,17 +14,20 @@ namespace ShadowClip.GUI
     public sealed class FileSelectViewModel : Screen, IHandle<RequestFileDelete>
     {
         private readonly IEventAggregator _eventAggregator;
-        private readonly BindableCollection<FileInfo> _files = new BindableCollection<FileInfo>();
+        private readonly BindableCollection<VideoFile> _videos = new BindableCollection<VideoFile>();
+        private readonly IThumbnailGenerator _thumbnailGenerator;
         private readonly ISettings _settings;
         private readonly List<FileSystemWatcher> _watchers = new List<FileSystemWatcher>();
 
-        public FileSelectViewModel(EventAggregator eventAggregator, ISettings settings)
+        public FileSelectViewModel(EventAggregator eventAggregator, ISettings settings,
+            IThumbnailGenerator thumbnailGenerator)
         {
             _eventAggregator = eventAggregator;
             _settings = settings;
+            _thumbnailGenerator = thumbnailGenerator;
             Path = _settings.ShadowplayPath;
-            Files = CollectionViewSource.GetDefaultView(_files);
-            Files.SortDescriptions.Add(new SortDescription("CreationTime", ListSortDirection.Descending));
+            Videos = CollectionViewSource.GetDefaultView(_videos);
+            Videos.SortDescriptions.Add(new SortDescription("CreationTime", ListSortDirection.Descending));
             _eventAggregator.Subscribe(this);
         }
 
@@ -46,9 +50,9 @@ namespace ShadowClip.GUI
             set => _settings.ShadowplayPath = value;
         }
 
-        public ICollectionView Files { get; }
+        public ICollectionView Videos { get; }
 
-        public FileInfo SelectedFile { get; set; }
+        public VideoFile SelectedVideo { get; set; }
 
         public string ErrorMessage { get; set; }
 
@@ -56,7 +60,7 @@ namespace ShadowClip.GUI
         {
             try
             {
-                DeleteAndUnselect(message.File);
+                DeleteAndUnselect(_videos.First(vid => vid.File.FullName == message.File.FullName));
             }
             catch
             {
@@ -87,14 +91,14 @@ namespace ShadowClip.GUI
                 var filesOnDisk = allDirectories.SelectMany(dir => dir.GetFiles("*.mp4"));
 
                 var newFiles =
-                    filesOnDisk.Where(info => _files.All(fileInfo => fileInfo.FullName != info.FullName)).ToList();
+                    filesOnDisk.Where(info => _videos.All(video => video.File.FullName != info.FullName)).ToList();
                 var deletedFiles =
-                    _files.Where(info => filesOnDisk.All(fileInfo => info.FullName != fileInfo.FullName)).ToList();
+                    _videos.Where(video => filesOnDisk.All(file => video.File.FullName != file.FullName)).ToList();
                 //Gotta add/delete one by one to stop the entire list from re-rendering
                 foreach (var deletedFile in deletedFiles)
-                    _files.Remove(deletedFile);
+                    _videos.Remove(deletedFile);
                 foreach (var addedFile in newFiles)
-                    _files.Add(addedFile);
+                    _videos.Add(new VideoFile(addedFile, _thumbnailGenerator));
 
                 _watchers.AddRange(allDirectories.Select(info => new FileSystemWatcher(info.FullName)));
 
@@ -129,9 +133,9 @@ namespace ShadowClip.GUI
             _watchers.Clear();
         }
 
-        public void OnSelectedFileChanged()
+        public void OnSelectedVideoChanged()
         {
-            _eventAggregator.PublishOnCurrentThread(new FileSelected(SelectedFile));
+            _eventAggregator.PublishOnCurrentThread(new FileSelected(SelectedVideo.File));
         }
 
         public void Browse()
@@ -146,7 +150,7 @@ namespace ShadowClip.GUI
             }
         }
 
-        public void Delete(FileInfo file)
+        public void Delete(VideoFile file)
         {
             try
             {
@@ -161,13 +165,13 @@ namespace ShadowClip.GUI
             }
         }
 
-        private void DeleteAndUnselect(FileInfo file)
+        private void DeleteAndUnselect(VideoFile video)
         {
-            if (file == SelectedFile)
-                SelectedFile = null;
+            if (video == SelectedVideo)
+                SelectedVideo = null;
 
-            file.Delete();
-            _files.Remove(file);
+            video.File.Delete();
+            _videos.Remove(video);
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
@@ -27,22 +28,6 @@ namespace ShadowClip.GUI
                 return isHeight ? width / aspectRatio / 2 : width / 2;
 
             return isHeight ? height / 2 : height * aspectRatio / 2;
-        }
-
-        public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
-        {
-            throw new NotImplementedException();
-        }
-    }
-
-    internal class VideoSourceConverter : IMultiValueConverter
-    {
-        public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
-        {
-            if (!(values[0] is string source)) return null;
-            if (!(values[1] is bool showVideo)) return null;
-
-            return showVideo ? new Uri(source) : null;
         }
 
         public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
