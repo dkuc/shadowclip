@@ -1,4 +1,5 @@
-﻿* Videos can be broken into multiple segments with different speeds/zooms
+﻿* Improved performance and ram usage of preview thumbnails
+* Videos can be broken into multiple segments with different speeds/zooms
 * Video speed can now be [.25x, .5x, 1x, 2x, 4x]
 * New domain name shadowclip.net (wtf was dankuc.com)
 * Fix first video load always skipping to end.
