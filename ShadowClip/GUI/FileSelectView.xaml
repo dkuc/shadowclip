@@ -20,6 +20,7 @@
         <StackPanel Grid.Row="1" Orientation="Horizontal">
             <CheckBox Content="Show Previews" IsChecked="{Binding ShowPreviews}" />
             <CheckBox Content="Show File Names" IsChecked="{Binding ShowFileNames}" />
+            <Button Name="Delete" Content="Delete Selected"/>
         </StackPanel>
         <ListBox Grid.Row="2" Name="Videos" VirtualizingPanel.VirtualizationMode="Recycling"
                  VirtualizingPanel.CacheLengthUnit="Page"
@@ -31,12 +32,16 @@
                                    Visibility="{Binding Path=DataContext.ShowFileNames, 
           RelativeSource={RelativeSource AncestorType={x:Type UserControl}}, Converter={StaticResource BooleanToVisibilityConverter}}" />
                         <StackPanel Orientation="Horizontal">
+                            <CheckBox VerticalAlignment="Center" IsChecked="{Binding IsSelected}"/>
                             <Image Source="{Binding Thumbnail, TargetNullValue={x:Null}}"
                                    Visibility="{Binding Path=DataContext.ShowPreviews, 
           RelativeSource={RelativeSource AncestorType={x:Type UserControl}}, Converter={StaticResource BooleanToVisibilityConverter}}" />
-                            <TextBlock Padding="5,0,5,0" Text="{Binding CreationTime}" />
-                            <Button Content="X" ToolTip="Delete" VerticalAlignment="Top" Padding="5" Margin="5"
-                                    cal:Message.Attach="[Event Click] = [Action Delete($dataContext)]" />
+                            <StackPanel>
+                                <TextBlock Padding="5,0,5,0" Text="{Binding CreationTime}" />
+                                <Button Content="Rename"  VerticalAlignment="Top" 
+                                        Padding="5" Margin="5" HorizontalAlignment="Left"
+                                        cal:Message.Attach="[Event Click] = [Action Rename($dataContext)]" />
+                            </StackPanel>
                         </StackPanel>
                     </StackPanel>
                 </DataTemplate>

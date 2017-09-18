@@ -7,6 +7,8 @@ using System.Windows.Data;
 using System.Windows.Forms;
 using Caliburn.Micro;
 using ShadowClip.services;
+using static System.IO.Path;
+using Application = System.Windows.Application;
 using Screen = Caliburn.Micro.Screen;
 
 namespace ShadowClip.GUI
@@ -135,7 +137,7 @@ namespace ShadowClip.GUI
 
         public void OnSelectedVideoChanged()
         {
-            _eventAggregator.PublishOnCurrentThread(new FileSelected(SelectedVideo.File));
+            _eventAggregator.PublishOnCurrentThread(new FileSelected(SelectedVideo?.File));
         }
 
         public void Browse()
@@ -150,14 +152,40 @@ namespace ShadowClip.GUI
             }
         }
 
-        public void Delete(VideoFile file)
+        public void Rename(VideoFile video)
+        {
+            var renameDialog = new RenameDialog
+            {
+                ResponseText = video.Name.Trim(".mp4".ToCharArray()),
+                Owner = Application.Current.MainWindow
+            };
+
+            var dialogResult = renameDialog.ShowDialog();
+            if (dialogResult != null && dialogResult.Value)
+            {
+                if (video == SelectedVideo)
+                    SelectedVideo = null;
+
+                var directory = GetDirectoryName(video.File.FullName);
+
+                if (directory == null)
+                    return;
+
+                var destFileName = Combine(directory, renameDialog.ResponseText + ".mp4");
+                _videos.Remove(video);
+                video.File.MoveTo(destFileName);
+            }
+        }
+
+        public void Delete()
         {
             try
             {
-                var dialogResult = MessageBox.Show("Are you sure you want to delete this?", "Delete File",
+                var dialogResult = MessageBox.Show("Are you sure you want to delete the selected videos?", "Delete Files",
                     MessageBoxButtons.OKCancel);
                 if (dialogResult == DialogResult.OK)
-                    DeleteAndUnselect(file);
+                    foreach (var selectedFile in _videos.Where(video => video.IsSelected).ToList())
+                        DeleteAndUnselect(selectedFile);
             }
             catch (Exception e)
             {

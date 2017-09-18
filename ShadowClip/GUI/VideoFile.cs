@@ -26,6 +26,7 @@ namespace ShadowClip.GUI
         public FileInfo File { get; }
         public string Name => File.Name;
         public DateTime CreationTime => File.CreationTime;
+        public bool IsSelected { get; set; }
 
 
         public string Thumbnail
