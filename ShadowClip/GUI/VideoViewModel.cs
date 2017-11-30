@@ -134,10 +134,9 @@ namespace ShadowClip.GUI
 
         public void AddSegment()
         {
-            var midPoint = (FirstSegment.End - FirstSegment.Start) / 2 + FirstSegment.Start;
-            var segment = new Segment {Start = midPoint, End = FirstSegment.End, Speed = 1, Zoom = 1};
-            Segments.Insert(1, segment);
-            FirstSegment.End = segment.Start;
+            var newSegment = new Segment { Start = CurrentSegment.Start, End = CurrentPosition, Speed = 1, Zoom = 1 };
+            CurrentSegment.Start = CurrentPosition;
+            Segments.Insert(Segments.IndexOf(CurrentSegment), newSegment);
         }
 
         public void RemoveSegment()
