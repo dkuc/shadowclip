@@ -11,6 +11,7 @@
                 </ResourceDictionary>
             </ResourceDictionary.MergedDictionaries>
             <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+            <gui:BooleanToThicknessConverter x:Key="BooleanToThicknessConverter" />
         </ResourceDictionary>
     </Application.Resources>
 </Application>

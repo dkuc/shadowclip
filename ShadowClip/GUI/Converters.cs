@@ -120,6 +120,14 @@ namespace ShadowClip.GUI
         }
     }
 
+    internal class BooleanToThicknessConverter : SimpleConverter<bool>
+    {
+        public override object Convert(bool isTrue)
+        {
+            return new Thickness(isTrue ? 2 : 0);
+        }
+    }
+
     internal abstract class SimpleConverter<T> : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
