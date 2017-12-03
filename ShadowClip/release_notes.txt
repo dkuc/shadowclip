@@ -1,4 +1,5 @@
-﻿* Can now select and delete multiple videos at once.
+﻿* New segments are now added at the current video position
+* Can now select and delete multiple videos at once.
 * Added ability to rename videos
 * Improved performance and ram usage of preview thumbnails
 * Videos can be broken into multiple segments with different speeds/zooms
