@@ -96,7 +96,7 @@ namespace ShadowClip.GUI.UploadDialog
         {
             switch (destination)
             {
-                case Destination.DanSite:
+                case Destination.Shadowclip:
                     return $"https://shadowclip.net/videos/{Uri.EscapeUriString(fileName)}";
                 case Destination.File:
                     return $"{Path.Combine(_settings.ShadowplayPath, fileName)}.mp4";

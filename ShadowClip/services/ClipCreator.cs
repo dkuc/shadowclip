@@ -10,7 +10,7 @@ namespace ShadowClip.services
 {
     public enum Destination
     {
-        DanSite,
+        Shadowclip,
         File,
         YouTube
     }
@@ -43,7 +43,7 @@ namespace ShadowClip.services
                     File.Move(outputFile, destFileName);
                     return "";
                 }
-                var uploader = destination == Destination.DanSite
+                var uploader = destination == Destination.Shadowclip
                     ? (IUploader) _container.Resolve<FileFormUploader>()
                     : _container.Resolve<YouTubeUploader>();
 

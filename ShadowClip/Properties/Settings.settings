@@ -38,7 +38,7 @@
       <Value Profile="(Default)">True</Value>
     </Setting>
     <Setting Name="Destination" Type="System.String" Scope="User">
-      <Value Profile="(Default)">DanSite</Value>
+      <Value Profile="(Default)">Shadowclip</Value>
     </Setting>
   </Settings>
 </SettingsFile>
