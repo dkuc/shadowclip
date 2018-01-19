@@ -91,6 +91,7 @@
     <SignManifests>true</SignManifests>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Microsoft.CSharp" />
     <Reference Include="System" />
     <Reference Include="System.Deployment" />
     <Reference Include="System.Windows.Forms" />
@@ -112,6 +113,7 @@
       <DependentUpon>RenameDialog.xaml</DependentUpon>
     </Compile>
     <Compile Include="GUI\VideoFile.cs" />
+    <Compile Include="services\JsonWebApiClient.cs" />
     <Compile Include="services\ThumbnailGenerator.cs" />
     <Compile Include="services\YouTubeUploader.cs" />
     <Compile Include="services\Segment.cs" />
@@ -206,6 +208,9 @@
     </PackageReference>
     <PackageReference Include="Google.Apis.YouTube.v3">
       <Version>1.25.0.760</Version>
+    </PackageReference>
+    <PackageReference Include="Newtonsoft.Json">
+      <Version>10.0.3</Version>
     </PackageReference>
     <PackageReference Include="PropertyChanged.Fody">
       <Version>2.1.4</Version>

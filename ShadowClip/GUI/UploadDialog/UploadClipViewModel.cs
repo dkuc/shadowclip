@@ -2,10 +2,13 @@
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Net.Http;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using Caliburn.Micro;
+using Newtonsoft.Json.Linq;
 using ShadowClip.services;
 
 namespace ShadowClip.GUI.UploadDialog
@@ -34,19 +37,33 @@ namespace ShadowClip.GUI.UploadDialog
         Done
     }
 
+    public enum NameState
+    {
+        Empty,
+        Working,
+        Taken,
+        Available,
+        Overwritable
+    }
+
     public sealed class UploadClipViewModel : Screen
     {
         private readonly IClipCreator _clipCreator;
         private readonly IEventAggregator _eventAggregator;
+        private readonly IJsonWebApiClient _apiClient;
         private readonly ISettings _settings;
         private CancellationTokenSource _cancelToken;
 
-        public UploadClipViewModel(IClipCreator clipCreator, ISettings settings, IEventAggregator eventAggregator,
+        public UploadClipViewModel(IClipCreator clipCreator,
+            ISettings settings,
+            IEventAggregator eventAggregator,
+            IJsonWebApiClient apiClient,
             UploadData data)
         {
             _clipCreator = clipCreator;
             _settings = settings;
             _eventAggregator = eventAggregator;
+            _apiClient = apiClient;
             OriginalFile = data.OriginalFile;
             Segments = data.Segments;
             FileName = "";
@@ -61,6 +78,8 @@ namespace ShadowClip.GUI.UploadDialog
 
         public State CurrentState { get; set; }
 
+        public NameState CurrentNameState { get; set; }
+
         public FileInfo OriginalFile { get; }
         public string FileName { get; set; }
 
@@ -69,6 +88,47 @@ namespace ShadowClip.GUI.UploadDialog
                 .Concat(Path.GetInvalidPathChars())
                 .Concat(new[] {' '})
                 .ToArray()));
+
+        public async void OnSafeFileNameChanged()
+        {
+            await SetNameState();
+        }
+
+        private async Task SetNameState()
+        {
+            if (string.IsNullOrEmpty(SafeFileName))
+            {
+                CurrentNameState = NameState.Empty;
+                return;
+            }
+
+            if (SelectedDestination != Destination.Shadowclip)
+            {
+                CurrentNameState = NameState.Empty;
+                return;
+            }
+            try
+            {
+                var result = await _apiClient.Get($"https://shadowclip.net/info/{Uri.EscapeUriString(SafeFileName)}.mp4");
+
+                if (result.exists == true && result.canDelete == true)
+                {
+                    CurrentNameState = NameState.Overwritable;
+                }
+                else if (result.exists == true)
+                {
+                    CurrentNameState = NameState.Taken;
+                }
+                else
+                {
+                    CurrentNameState = NameState.Available;
+                }
+            }
+            catch
+            {
+                CurrentNameState = NameState.Empty;
+            }
+        }
 
         public double StartTime => Segments.First().Start;
         public double EndTime => Segments.Last().End;

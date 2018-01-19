@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Globalization;
-using System.IO;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
@@ -50,6 +49,46 @@ namespace ShadowClip.GUI
         }
     }
 
+    internal class NameStateTextConverter : SimpleConverter<NameState>
+    {
+        public override object Convert(NameState state)
+        {
+            switch (state)
+            {
+                case NameState.Empty:
+                    return "";
+                case NameState.Working:
+                    return "Checking availability...";
+                case NameState.Taken:
+                    return "File Name Taken";
+                case NameState.Available:
+                    return "Available";
+                case NameState.Overwritable:
+                    return "File Exists - Overwritable";
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(state), state, null);
+            }
+        }
+    }
+
+    internal class NameStateBackgroundConverter : SimpleConverter<NameState>
+    {
+        public override object Convert(NameState state)
+        {
+            switch (state)
+            {
+                case NameState.Taken:
+                    return new SolidColorBrush(Colors.IndianRed);
+                case NameState.Available:
+                    return new SolidColorBrush(Colors.MediumSeaGreen);
+                case NameState.Overwritable:
+                    return new SolidColorBrush(Colors.Yellow);
+                default:
+                    return DependencyProperty.UnsetValue;
+            }
+        }
+    }
+
     internal class BitRateConverter : SimpleConverter<int>
     {
         public override object Convert(int bytesPerSecond)
@@ -75,7 +114,7 @@ namespace ShadowClip.GUI
     {
         public override object Convert(decimal speed)
         {
-            if(speed > 1)
+            if (speed > 1)
                 return new SolidColorBrush(Colors.LightSalmon);
 
             if (speed < 1)

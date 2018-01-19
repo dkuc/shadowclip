@@ -5,11 +5,14 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
 
              xmlns:gui="clr-namespace:ShadowClip.GUI"
-             xmlns:cal="http://www.caliburnproject.org"
+             xmlns:cal="http://www.caliburnproject.org" 
+             xmlns:controls="clr-namespace:ShadowClip.GUI.Controls"
              mc:Ignorable="d"
              d:DesignWidth="300">
     <UserControl.Resources>
         <gui:StateToBoolConverter x:Key="StateToBoolConverter" />
+        <gui:NameStateTextConverter x:Key="NameStateTextConverter" />
+        <gui:NameStateBackgroundConverter x:Key="NameStateBackgroundConverter" />
         <gui:BitRateConverter x:Key="BitRateConverter" />
         <gui:DestinationToVisibilityConverter x:Key="DestinationToVisibilityConverter" />
     </UserControl.Resources>
@@ -38,9 +41,14 @@
 
             <StackPanel Orientation="Horizontal">
                 <TextBlock Text="File Name:" />
-                <TextBox Text="{Binding FileName, UpdateSourceTrigger=PropertyChanged}" MinWidth="200" MaxLength="30"
+                <TextBox Text="{Binding FileName, UpdateSourceTrigger=PropertyChanged, Delay=200}" MinWidth="200" MaxLength="30"
                          IsEnabled="{Binding CurrentState,Converter={StaticResource StateToBoolConverter},ConverterParameter='ready,error'}" />
             </StackPanel>
+
+            <TextBlock Text="{Binding CurrentNameState, Converter={StaticResource NameStateTextConverter}}"
+                       Background="{Binding CurrentNameState, Converter={StaticResource NameStateBackgroundConverter}}"
+                       HorizontalAlignment="Center"/>
+           
 
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                 <Button Name="StartUpload" Content="Clip And Upload"
@@ -48,7 +56,7 @@
                 <Button Name="Cancel" Content="Cancel"
                         IsEnabled="{Binding CurrentState,Converter={StaticResource StateToBoolConverter}, ConverterParameter=working}" />
             </StackPanel>
-
+            
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto" />
