@@ -16,9 +16,9 @@ namespace ShadowClip.GUI
     public sealed class FileSelectViewModel : Screen, IHandle<RequestFileDelete>
     {
         private readonly IEventAggregator _eventAggregator;
-        private readonly BindableCollection<VideoFile> _videos = new BindableCollection<VideoFile>();
-        private readonly IThumbnailGenerator _thumbnailGenerator;
         private readonly ISettings _settings;
+        private readonly IThumbnailGenerator _thumbnailGenerator;
+        private readonly BindableCollection<VideoFile> _videos = new BindableCollection<VideoFile>();
         private readonly List<FileSystemWatcher> _watchers = new List<FileSystemWatcher>();
 
         public FileSelectViewModel(EventAggregator eventAggregator, ISettings settings,
@@ -132,6 +132,7 @@ namespace ShadowClip.GUI
                 watcher.Deleted -= OnFileWatchEvent;
                 watcher.EnableRaisingEvents = false;
             }
+
             _watchers.Clear();
         }
 
@@ -181,7 +182,8 @@ namespace ShadowClip.GUI
         {
             try
             {
-                var dialogResult = MessageBox.Show("Are you sure you want to delete the selected videos?", "Delete Files",
+                var dialogResult = MessageBox.Show("Are you sure you want to delete the selected videos?",
+                    "Delete Files",
                     MessageBoxButtons.OKCancel);
                 if (dialogResult == DialogResult.OK)
                     foreach (var selectedFile in _videos.Where(video => video.IsSelected).ToList())

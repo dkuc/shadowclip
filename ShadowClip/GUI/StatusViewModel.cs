@@ -31,6 +31,7 @@ namespace ShadowClip.GUI
                     var currentDeploymentCurrentVersion = applicationDeployment.CurrentVersion;
                     return $"V. {currentDeploymentCurrentVersion}";
                 }
+
                 return "V. 0";
             }
         }

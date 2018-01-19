@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ShadowClip.GUI"
         mc:Ignorable="d"
-        Title="Rename Dialog" SizeToContent="WidthAndHeight" ResizeMode="NoResize" Activated="RenameDialog_OnActivated" >
+        Title="Rename Dialog" SizeToContent="WidthAndHeight" ResizeMode="NoResize" Activated="RenameDialog_OnActivated">
 
     <StackPanel HorizontalAlignment="Left">
         <StackPanel Orientation="Horizontal">

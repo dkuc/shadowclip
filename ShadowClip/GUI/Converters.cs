@@ -104,6 +104,7 @@ namespace ShadowClip.GUI
                 rate /= 1024;
                 ordinal++;
             }
+
             var roundedValue = Math.Round(rate, 2, MidpointRounding.AwayFromZero);
 
             return $"{roundedValue} {ordinals[ordinal]}B/s";

@@ -7,7 +7,8 @@ namespace ShadowClip.services
 {
     public interface IEncoder
     {
-        Task Encode(string originalFile, string outputFile, IEnumerable<Segment> segments, bool useGpu, IProgress<EncodeProgress> encodeProgress, CancellationToken cancelToken);
+        Task Encode(string originalFile, string outputFile, IEnumerable<Segment> segments, bool useGpu,
+            IProgress<EncodeProgress> encodeProgress, CancellationToken cancelToken);
     }
 
     public class EncodeProgress

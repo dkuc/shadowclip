@@ -48,6 +48,7 @@ namespace ShadowClip.GUI
                 drawingContext.DrawRectangle(sourceBrush, null, new Rect(new Point(0, 0),
                     new Point(actualWidth, actualHeight)));
             }
+
             renderTarget.Render(drawingVisual);
             var zoomedBitmap = new TransformedBitmap(renderTarget, new ScaleTransform(zoom, zoom));
             var croppedBitmap = new CroppedBitmap(zoomedBitmap, new Int32Rect(

@@ -4,7 +4,6 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
-using System.Windows.Media;
 using Caliburn.Micro;
 using ShadowClip.services;
 
@@ -76,7 +75,7 @@ namespace ShadowClip.GUI.Controls
                 Child = new TextBlock {Text = "Preview"}
             };
 
-            Binding myBinding = new Binding
+            var myBinding = new Binding
             {
                 Source = segment,
                 Path = new PropertyPath("Speed"),
@@ -104,6 +103,7 @@ namespace ShadowClip.GUI.Controls
                 AddRect(segment);
                 AddSplitter();
             }
+
             var column = 0;
             foreach (UIElement child in SegGrid.Children)
             {
@@ -121,10 +121,11 @@ namespace ShadowClip.GUI.Controls
                 AddColumn(1, GridUnitType.Star);
                 AddColumn(SplitWidth, GridUnitType.Pixel);
             }
+
             AddColumn(1, GridUnitType.Star);
         }
 
-        
+
         private void Init()
         {
             // ReSharper disable once CompareOfFloatsByEqualityOperator
@@ -141,7 +142,7 @@ namespace ShadowClip.GUI.Controls
             foreach (var segment in Segments)
                 // ReSharper disable once SuspiciousTypeConversion.Global
                 ((INotifyPropertyChanged) segment).PropertyChanged += SegmentsChanged;
-            if(_previousSegments != Segments)
+            if (_previousSegments != Segments)
                 Segments.CollectionChanged += (sender, args) => Init();
 
             _previousSegments = Segments;
@@ -205,6 +206,7 @@ namespace ShadowClip.GUI.Controls
 
                 index++;
             }
+
             _newWidths = false;
         }
 
@@ -216,11 +218,11 @@ namespace ShadowClip.GUI.Controls
 
     public class SegClicked : EventArgs
     {
-        public Segment Segment { get; }
-
         public SegClicked(Segment segment)
         {
             Segment = segment;
         }
+
+        public Segment Segment { get; }
     }
 }

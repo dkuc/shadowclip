@@ -117,6 +117,7 @@ namespace ShadowClip.GUI
                 VideoPlayer.Source = null;
                 return;
             }
+
             VideoPlayer.Source = new Uri(message.File.FullName);
             VideoPlayer.Play();
             SetPostion(TimeSpan.Zero);
@@ -134,7 +135,7 @@ namespace ShadowClip.GUI
 
         public void AddSegment()
         {
-            var newSegment = new Segment { Start = CurrentSegment.Start, End = CurrentPosition, Speed = 1, Zoom = 1 };
+            var newSegment = new Segment {Start = CurrentSegment.Start, End = CurrentPosition, Speed = 1, Zoom = 1};
             CurrentSegment.Start = CurrentPosition;
             Segments.Insert(Segments.IndexOf(CurrentSegment), newSegment);
         }
@@ -208,8 +209,7 @@ namespace ShadowClip.GUI
             timer.Tick += (sender, args) =>
             {
                 NotifyOfPropertyChange("");
-                if(Speed != (decimal) VideoPlayer.SpeedRatio) OnSpeedChanged();
-
+                if (Speed != (decimal) VideoPlayer.SpeedRatio) OnSpeedChanged();
             };
             timer.Start();
         }

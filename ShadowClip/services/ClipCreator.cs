@@ -29,8 +29,10 @@ namespace ShadowClip.services
             _settings = settings;
         }
 
-        public async Task<string> ClipAndUpload(string originalFile, string clipName, IEnumerable<Segment> segments, bool useGpu,
-            Destination destination, Progress<EncodeProgress> encodeProgress, Progress<UploadProgress> uploadProgress, CancellationToken cancelToken)
+        public async Task<string> ClipAndUpload(string originalFile, string clipName, IEnumerable<Segment> segments,
+            bool useGpu,
+            Destination destination, Progress<EncodeProgress> encodeProgress, Progress<UploadProgress> uploadProgress,
+            CancellationToken cancelToken)
         {
             var outputFile = Path.GetTempFileName();
             try
@@ -43,6 +45,7 @@ namespace ShadowClip.services
                     File.Move(outputFile, destFileName);
                     return "";
                 }
+
                 var uploader = destination == Destination.Shadowclip
                     ? (IUploader) _container.Resolve<FileFormUploader>()
                     : _container.Resolve<YouTubeUploader>();
@@ -62,6 +65,5 @@ namespace ShadowClip.services
                     }
             }
         }
-
     }
 }

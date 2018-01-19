@@ -11,7 +11,7 @@ namespace ShadowClip.services
 {
     public class FfmpegEncoder : IEncoder
     {
-        public Task Encode(string originalFile, string outputFile, IEnumerable<Segment> segments, 
+        public Task Encode(string originalFile, string outputFile, IEnumerable<Segment> segments,
             bool useGpu, IProgress<EncodeProgress> encodeProgresss, CancellationToken cancelToken)
         {
             var taskCompletionSource = new TaskCompletionSource<bool>();
@@ -20,12 +20,9 @@ namespace ShadowClip.services
 
             try
             {
-                
                 if (duration <= 0)
                     throw new Exception("Invalid start and end times.");
 
-
-                
 
                 var process = new Process
                 {
@@ -37,7 +34,6 @@ namespace ShadowClip.services
                         CreateNoWindow = true,
                         FileName = @"ffmpeg.exe",
                         Arguments = BuildFfmpegCommand()
-
                     }
                 };
 
@@ -106,7 +102,6 @@ namespace ShadowClip.services
 
             string BuildFfmpegCommand()
             {
- 
                 var filter = "";
                 var index = 0;
                 var concat = "";
@@ -127,17 +122,14 @@ namespace ShadowClip.services
                     {
                         var extraSlow = segment.Speed > 2 || segment.Speed < 0.5m;
                         var audioSuffix = extraSlow ? "tmp2" : "";
-                        var audioSpeed = Math.Max(0.5, Math.Min(2d, (double)segment.Speed));
+                        var audioSpeed = Math.Max(0.5, Math.Min(2d, (double) segment.Speed));
                         filter += $"[video{index}tmp]setpts=PTS/{segment.Speed}[video{index}];";
                         filter += $"[audio{index}tmp]atempo={audioSpeed}[audio{index}{audioSuffix}];";
-                        if(extraSlow)
+                        if (extraSlow)
                             filter += $"[audio{index}tmp2]atempo={audioSpeed}[audio{index}];";
-
                     }
-
-           
-                    
                 }
+
                 concat += $"concat=n={segments.Count()}:v=1:a=1[final]";
                 filter += concat;
 
