@@ -127,6 +127,7 @@ namespace ShadowClip.GUI.UploadDialog
 
             try
             {
+                CurrentNameState = NameState.Working;
                 var result =
                     await _apiClient.Get($"https://shadowclip.net/info/{Uri.EscapeUriString(SafeFileName)}.mp4");
 
