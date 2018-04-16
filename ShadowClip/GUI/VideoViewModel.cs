@@ -135,8 +135,26 @@ namespace ShadowClip.GUI
 
         public void AddSegment()
         {
-            var newSegment = new Segment {Start = CurrentSegment.Start, End = CurrentPosition, Speed = 1, Zoom = 1};
-            CurrentSegment.Start = CurrentPosition;
+            var newSegStart = CurrentSegment.Start;
+            var newSegEnd = CurrentPosition;
+            if (CurrentPosition < FirstSegment.Start)
+            {
+                newSegEnd = CurrentSegment.Start;
+            }
+
+            else if (CurrentPosition > FinalSegment.End)
+            {
+                newSegStart = FinalSegment.Start;
+                newSegEnd = FinalSegment.End;
+                FinalSegment.Start = FinalSegment.End;
+            }
+            else
+            {
+                CurrentSegment.Start = CurrentPosition;
+            }
+
+            var newSegment = new Segment {Start = newSegStart, End = newSegEnd, Speed = 1, Zoom = 1};
+            
             Segments.Insert(Segments.IndexOf(CurrentSegment), newSegment);
         }
 
