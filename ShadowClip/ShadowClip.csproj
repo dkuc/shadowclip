@@ -79,10 +79,10 @@
     <ApplicationIcon>Shaunkleyn-Phlat-Blue-Folders-Movies.ico</ApplicationIcon>
   </PropertyGroup>
   <PropertyGroup>
-    <ManifestCertificateThumbprint>42A3D830F70BA5BBAD2DED9FED66A65CB5798CBD</ManifestCertificateThumbprint>
+    <ManifestCertificateThumbprint>53711C7B0984C07BCD4E6B998F2C2AEEA206C3F1</ManifestCertificateThumbprint>
   </PropertyGroup>
   <PropertyGroup>
-    <ManifestKeyFile>ShadowClip_TemporaryKey.pfx</ManifestKeyFile>
+    <ManifestKeyFile>ShadowClipCert.pfx</ManifestKeyFile>
   </PropertyGroup>
   <PropertyGroup>
     <GenerateManifests>true</GenerateManifests>
@@ -187,7 +187,7 @@
     </Compile>
     <None Include="scripts\before_publish.bat" />
     <None Include="scripts\after_publish.bat" />
-    <None Include="ShadowClip_TemporaryKey.pfx" />
+    <None Include="ShadowClipCert.pfx" />
     <Resource Include="Shaunkleyn-Phlat-Blue-Folders-Movies.ico" />
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
