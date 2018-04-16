@@ -1,4 +1,6 @@
-﻿* Added a border to make it easier to see which video is selected
+﻿* Fixed crash on segment add
+* Added check to see if file name is available before uploading
+* Added a border to make it easier to see which video is selected
 * New segments are now added at the current video position
 * Can now select and delete multiple videos at once.
 * Added ability to rename videos
