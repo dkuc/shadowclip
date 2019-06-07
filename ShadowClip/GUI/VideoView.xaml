@@ -7,7 +7,7 @@
              xmlns:gui="clr-namespace:ShadowClip.GUI"
              xmlns:controls="clr-namespace:ShadowClip.GUI.Controls"
              mc:Ignorable="d"
-             d:DesignHeight="300" d:DesignWidth="300">
+             d:DesignHeight="300" d:DesignWidth="700">
     <UserControl.Resources>
         <gui:MaxLengthConverter x:Key="MaxLength" />
         <gui:PlayActionCoverter x:Key="PlayActionCoverter" />
@@ -120,10 +120,14 @@
                                Text="{Binding EndPosition,  Converter={StaticResource IntegerSecondsConverter}}"
                                MinWidth="30" />
                 </StackPanel>
-                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                    <Button Content="Upload Clip" Name="Upload" />
-                    <Button Content="Copy Screenshot" Name="Screenshot" />
-                </StackPanel>
+                <Grid>
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                        <Button Content="Upload Clip" Name="Upload" />
+                        <Button Content="Copy Screenshot" Name="Screenshot" />
+                    </StackPanel>
+                    <CheckBox Content="Software Render" IsChecked="{Binding IsSoftware}" HorizontalAlignment="Right"
+                              VerticalAlignment="Bottom" ToolTip="Turn off hardware acceleration. May reduce video playbook issues." />
+                </Grid>
             </StackPanel>
 
 

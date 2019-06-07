@@ -112,6 +112,9 @@
     <Compile Include="GUI\RenameDialog.xaml.cs">
       <DependentUpon>RenameDialog.xaml</DependentUpon>
     </Compile>
+    <Compile Include="GUI\ShellView.cs" >
+      <DependentUpon>ShellView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="GUI\VideoFile.cs" />
     <Compile Include="services\JsonWebApiClient.cs" />
     <Compile Include="services\ThumbnailGenerator.cs" />

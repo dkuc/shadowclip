@@ -10,6 +10,7 @@
         Top="{Binding Top, Mode=TwoWay}"
         Left="{Binding Left, Mode=TwoWay}"
         WindowState="{Binding Maximized, Mode=TwoWay}"
+        Loaded="ShellView_OnLoaded"
         cal:Message.Attach="[Event Closing] = [Action OnClosing()]">
     <Grid>
         <Grid.RowDefinitions>
