@@ -1,4 +1,7 @@
-﻿* Fixed crash on segment add
+﻿* Fixed video freeze when video scrubbing when speed is set to < 1
+* Fixed video freeze when advancing less than one whole frame
+* Added software render option - may fix some playback issues ¯\_(ツ)_/¯
+* Fixed crash on segment add
 * Added check to see if file name is available before uploading
 * Added a border to make it easier to see which video is selected
 * New segments are now added at the current video position
