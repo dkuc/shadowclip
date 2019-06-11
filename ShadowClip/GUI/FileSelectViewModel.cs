@@ -6,6 +6,7 @@ using System.Linq;
 using System.Windows.Data;
 using System.Windows.Forms;
 using Caliburn.Micro;
+using ShadowClip.GUI.UploadDialog;
 using ShadowClip.services;
 using static System.IO.Path;
 using Application = System.Windows.Application;
@@ -18,15 +19,17 @@ namespace ShadowClip.GUI
         private readonly IEventAggregator _eventAggregator;
         private readonly ISettings _settings;
         private readonly IThumbnailGenerator _thumbnailGenerator;
+        private readonly IDialogBuilder _dialogBuilder;
         private readonly BindableCollection<VideoFile> _videos = new BindableCollection<VideoFile>();
         private readonly List<FileSystemWatcher> _watchers = new List<FileSystemWatcher>();
 
         public FileSelectViewModel(EventAggregator eventAggregator, ISettings settings,
-            IThumbnailGenerator thumbnailGenerator)
+            IThumbnailGenerator thumbnailGenerator, IDialogBuilder dialogBuilder)
         {
             _eventAggregator = eventAggregator;
             _settings = settings;
             _thumbnailGenerator = thumbnailGenerator;
+            _dialogBuilder = dialogBuilder;
             Path = _settings.ShadowplayPath;
             Videos = CollectionViewSource.GetDefaultView(_videos);
             Videos.SortDescriptions.Add(new SortDescription("CreationTime", ListSortDirection.Descending));
@@ -62,7 +65,11 @@ namespace ShadowClip.GUI
         {
             try
             {
-                DeleteAndUnselect(_videos.First(vid => vid.File.FullName == message.File.FullName));
+                foreach (var file in message.Files)
+                {
+                    DeleteAndUnselect(_videos.First(vid => vid.File.FullName == file.FullName));
+                }
+                
             }
             catch
             {
@@ -193,6 +200,17 @@ namespace ShadowClip.GUI
             {
                 MessageBox.Show("It didn't work: " + e.Message);
             }
+        }
+
+        public void CombineClips()
+        {
+            var videoFiles = _videos.Where(video => video.IsSelected);
+            if (videoFiles.Count() < 2)
+            {
+                MessageBox.Show("You must select at least two clips.");
+                return;
+            }
+            _dialogBuilder.BuildDialog<UploadClipViewModel>(new UploadData(videoFiles));
         }
 
         private void DeleteAndUnselect(VideoFile video)

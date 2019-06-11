@@ -1,4 +1,6 @@
-﻿using System.IO;
+﻿using System.Collections.Generic;
+using System.IO;
+using System.Windows.Documents;
 
 namespace ShadowClip.GUI
 {
@@ -16,9 +18,14 @@ namespace ShadowClip.GUI
     {
         public RequestFileDelete(FileInfo file)
         {
-            File = file;
+            Files = new[] {file}; 
         }
 
-        public FileInfo File { get; }
+        public RequestFileDelete(IEnumerable<FileInfo> files)
+        {
+            Files = files;
+        }
+
+        public IEnumerable<FileInfo> Files { get; }
     }
 }

@@ -12,15 +12,16 @@
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
         <StackPanel Orientation="Horizontal">
-            <TextBlock Text="{Binding Path}" />
             <Button Name="Browse" Content="Browse" />
+            <TextBlock Text="{Binding Path}" />
         </StackPanel>
         <StackPanel Grid.Row="1" Orientation="Horizontal">
             <CheckBox Content="Show Previews" IsChecked="{Binding ShowPreviews}" />
             <CheckBox Content="Show File Names" IsChecked="{Binding ShowFileNames}" />
-            <Button Name="Delete" Content="Delete Selected" />
+            
         </StackPanel>
         <ListBox Grid.Row="2" Name="Videos" VirtualizingPanel.VirtualizationMode="Recycling"
                  VirtualizingPanel.CacheLengthUnit="Page"
@@ -62,6 +63,11 @@
 
         </ListBox>
         <TextBlock Grid.Row="2" Text="{Binding ErrorMessage}" VerticalAlignment="Center" HorizontalAlignment="Center" />
+        <StackPanel Grid.Row="3" Orientation="Horizontal">
+            <Button Name="CombineClips" Content="Combine Selected"/>
+            <Button Name="Delete" Content="Delete Selected" />
+        </StackPanel>
+        
 
     </Grid>
 </UserControl>

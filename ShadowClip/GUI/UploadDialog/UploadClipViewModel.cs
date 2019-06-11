@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -13,11 +14,22 @@ namespace ShadowClip.GUI.UploadDialog
 {
     public class UploadData
     {
+        public IEnumerable<VideoFile> VideoFiles { get; }
+
         public UploadData(FileInfo originalFile, BindableCollection<Segment> segments)
         {
             OriginalFile = originalFile;
             Segments = segments;
+            IsMultiClip = false;
         }
+        
+        public UploadData(IEnumerable<VideoFile> videoFiles)
+        {
+            VideoFiles = videoFiles;
+            IsMultiClip = true;
+        }
+
+        public bool IsMultiClip { get; }
 
         public BindableCollection<Segment> Segments { get; }
 
@@ -60,10 +72,16 @@ namespace ShadowClip.GUI.UploadDialog
             _eventAggregator = eventAggregator;
             _apiClient = apiClient;
             OriginalFile = data.OriginalFile;
-            Segments = data.Segments;
+            Segments = data.IsMultiClip ? new BindableCollection<Segment> {new Segment()} : data.Segments;
+            IsMultiClip = data.IsMultiClip;
+            VideoFiles = data.IsMultiClip ? new BindableCollection<VideoFile>(data.VideoFiles) : null;
             FileName = "";
             DisplayName = "Uploader";
         }
+
+        public BindableCollection<VideoFile> VideoFiles { get; }
+
+        public bool IsMultiClip { get; }
 
         public BindableCollection<Segment> Segments { get; }
 
@@ -172,23 +190,38 @@ namespace ShadowClip.GUI.UploadDialog
                 CurrentState = State.Working;
                 ErrorText = "";
                 _cancelToken = new CancellationTokenSource();
-                YouTubeId = await _clipCreator.ClipAndUpload(OriginalFile.FullName, $"{SafeFileName}.mp4",
-                    Segments,
-                    UseFfmpeg,
-                    SelectedDestination,
-                    new Progress<EncodeProgress>(ep =>
-                    {
-                        EncodeProgress = ep.PercentComplete;
-                        EncodeFps = ep.FramesPerSecond;
-                    }),
-                    new Progress<UploadProgress>(up =>
-                    {
-                        UploadProgress = up.PercentComplete;
-                        UploadRate = up.BitsPerSecond;
-                    }), _cancelToken.Token);
+                var uploadProgress = new Progress<UploadProgress>(up =>
+                {
+                    UploadProgress = up.PercentComplete;
+                    UploadRate = up.BitsPerSecond;
+                });
+                var encodeProgress = new Progress<EncodeProgress>(ep =>
+                {
+                    EncodeProgress = ep.PercentComplete;
+                    EncodeFps = ep.FramesPerSecond;
+                });
+
+                if (IsMultiClip)
+                    YouTubeId = await _clipCreator.ClipAndUpload(VideoFiles.Select(vf => vf.File).ToList(),
+                        $"{SafeFileName}.mp4",
+                        UseFfmpeg,
+                        SelectedDestination,
+                        encodeProgress,
+                        uploadProgress, _cancelToken.Token);
+                else
+                    YouTubeId = await _clipCreator.ClipAndUpload(OriginalFile.FullName, $"{SafeFileName}.mp4",
+                        Segments,
+                        UseFfmpeg,
+                        SelectedDestination,
+                        encodeProgress,
+                        uploadProgress, _cancelToken.Token);
+                    
+
                 CurrentState = State.Done;
                 if (DeleteOnSuccess)
-                    _eventAggregator.PublishOnCurrentThread(new RequestFileDelete(OriginalFile));
+                    _eventAggregator.PublishOnCurrentThread(IsMultiClip
+                        ? new RequestFileDelete(VideoFiles.Select(vf => vf.File))
+                        : new RequestFileDelete(OriginalFile));
             }
             catch (Exception e)
             {
@@ -245,6 +278,22 @@ namespace ShadowClip.GUI.UploadDialog
         public void OnSelectedDestinationChanged()
         {
             _settings.Destination = SelectedDestination;
+        }
+
+        public void MoveUp(VideoFile video)
+        {
+            var oldIndex = VideoFiles.IndexOf(video);
+            if (oldIndex > 0)
+                VideoFiles.Move(oldIndex, oldIndex - 1);
+            NotifyOfPropertyChange(() => VideoFiles);
+        }
+
+        public void MoveDown(VideoFile video)
+        {
+            var oldIndex = VideoFiles.IndexOf(video);
+            if (oldIndex < VideoFiles.Count - 1)
+                VideoFiles.Move(oldIndex, oldIndex + 1);
+            NotifyOfPropertyChange(() => VideoFiles);
         }
     }
 }

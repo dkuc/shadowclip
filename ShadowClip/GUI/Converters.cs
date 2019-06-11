@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Globalization;
 using System.Linq;
 using System.Windows;
@@ -27,6 +28,21 @@ namespace ShadowClip.GUI
                 return isHeight ? width / aspectRatio / 2 : width / 2;
 
             return isHeight ? height / 2 : height * aspectRatio / 2;
+        }
+
+        public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    internal class ListPositionConverter : IMultiValueConverter
+    {
+        public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
+        {
+            var item = values[0];
+            var list = (IList) values[1];
+            return $"{list.IndexOf(item) + 1}.";
         }
 
         public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
@@ -196,5 +212,13 @@ namespace ShadowClip.GUI
         }
 
         public abstract object Convert(T value, string parameter);
+    }
+
+    internal class InverseBooleanToVisibilityConverter : SimpleConverter<bool>
+    {
+        public override object Convert(bool isHidden)
+        {
+            return isHidden ? Visibility.Collapsed : Visibility.Visible;
+        }
     }
 }

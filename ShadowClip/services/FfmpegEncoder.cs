@@ -11,19 +11,16 @@ namespace ShadowClip.services
 {
     public class FfmpegEncoder : IEncoder
     {
-        public Task Encode(string originalFile, string outputFile, IEnumerable<Segment> segments,
-            bool useGpu, IProgress<EncodeProgress> encodeProgresss, CancellationToken cancelToken)
+        private Task Encode(string ffmpegCommand, double duration, IProgress<EncodeProgress> encodeProgresss,
+            CancellationToken cancelToken)
         {
             var taskCompletionSource = new TaskCompletionSource<bool>();
             var lastOutput = "";
-            var duration = segments.Sum(segment => (segment.End - segment.Start) / (double) segment.Speed);
 
             try
             {
                 if (duration <= 0)
                     throw new Exception("Invalid start and end times.");
-
-
                 var process = new Process
                 {
                     StartInfo =
@@ -33,7 +30,7 @@ namespace ShadowClip.services
                         UseShellExecute = false,
                         CreateNoWindow = true,
                         FileName = @"ffmpeg.exe",
-                        Arguments = BuildFfmpegCommand()
+                        Arguments = ffmpegCommand
                     }
                 };
 
@@ -99,6 +96,14 @@ namespace ShadowClip.services
                     }
                 }
             }
+        }
+
+        public Task Encode(string originalFile, string outputFile, IEnumerable<Segment> segments,
+            bool useGpu, IProgress<EncodeProgress> encodeProgresss, CancellationToken cancelToken)
+        {
+            var duration = segments.Sum(segment => (segment.End - segment.Start) / (double) segment.Speed);
+
+            return Encode(BuildFfmpegCommand(), duration, encodeProgresss, cancelToken);
 
             string BuildFfmpegCommand()
             {
@@ -134,9 +139,71 @@ namespace ShadowClip.services
                 filter += concat;
 
                 var encoder = useGpu ? "h264_nvenc" : "libx264 ";
-                return
+                var command =
                     $"-nostdin -i \"{originalFile}\" -c:v {encoder} -filter_complex \"{filter}\"  -global_quality:v 33 -movflags faststart -f mp4 -y -map [final] \"{outputFile}\"";
+                Console.WriteLine(command);
+                return command;
             }
+        }
+
+        public async Task Encode(IReadOnlyList<FileInfo> clips, string outputFile, bool useGpu,
+            Progress<EncodeProgress> encodeProgress,
+            CancellationToken cancelToken)
+        {
+            var duration = await GetFullDuration(clips);
+
+            await Encode(BuildFfmpegCommand(), duration, encodeProgress, cancelToken);
+
+            string BuildFfmpegCommand()
+            {
+                var filter = string.Join(" ", Enumerable.Range(0, clips.Count).Select(i => $"[{i}:v] [{i}:a] "));
+                filter += $"concat=n={clips.Count}:v=1:a=1[final]";
+                var encoder = useGpu ? "h264_nvenc" : "libx264 ";
+                var inputFiles = string.Join(" ", clips.Select(file => $"-i \"{file.FullName}\""));
+                var command =
+                    $"-nostdin {inputFiles} -c:v {encoder} -filter_complex \"{filter}\"  -global_quality:v 33 -movflags faststart -f mp4 -y -map [final] \"{outputFile}\"";
+                Console.WriteLine(command);
+                return command;
+            }
+        }
+
+        private async Task<double> GetFullDuration(IReadOnlyList<FileInfo> clips)
+        {
+            var durations = await Task.WhenAll(clips.Select(clip => GetDuration(clip.FullName)));
+            return durations.Sum();
+        }
+
+        private async Task<double> GetDuration(string videoFilePath)
+        {
+            var process = new Process
+            {
+                StartInfo =
+                {
+                    RedirectStandardError = true,
+                    RedirectStandardOutput = true,
+                    UseShellExecute = false,
+                    CreateNoWindow = true,
+                    FileName = @"ffmpeg.exe",
+                    Arguments = $"-i \"{videoFilePath}\""
+                }
+            };
+
+            process.Start();
+            var stream = process.StandardError;
+            var line = "No Output";
+            while (!stream.EndOfStream)
+            {
+                line = await stream.ReadLineAsync();
+                var pattern = @"Duration: (\d\d:\d\d:\d\d\.\d\d)";
+                var match = Regex.Match(line, pattern);
+                if (match.Success)
+                {
+                    var timeString = match.Groups[1].Value;
+                    return TimeSpan.Parse(timeString).TotalSeconds;
+                }
+            }
+
+            throw new Exception($"Could not get duration of video: {line}");
         }
     }
 }

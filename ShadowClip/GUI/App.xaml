@@ -12,6 +12,19 @@
             </ResourceDictionary.MergedDictionaries>
             <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
             <gui:BooleanToThicknessConverter x:Key="BooleanToThicknessConverter" />
+            <gui:InverseBooleanToVisibilityConverter x:Key="InverseBooleanToVisibilityConverter" />
+            <gui:ListPositionConverter x:Key="ListPositionConverter" />
+            <Style TargetType="{x:Type Button}">
+                <Setter Property="Margin" Value="2"/>
+            </Style>
+            <Style TargetType="{x:Type TextBlock}">
+                <Setter Property="Margin" Value="2"/>
+                <Setter Property="VerticalAlignment" Value="Bottom"/>
+
+            </Style>
+            <Style TargetType="{x:Type CheckBox}">
+                <Setter Property="Margin" Value="2"/>
+            </Style>
         </ResourceDictionary>
     </Application.Resources>
 </Application>

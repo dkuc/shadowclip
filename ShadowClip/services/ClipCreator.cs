@@ -29,16 +29,32 @@ namespace ShadowClip.services
             _settings = settings;
         }
 
-        public async Task<string> ClipAndUpload(string originalFile, string clipName, IEnumerable<Segment> segments,
-            bool useGpu,
-            Destination destination, Progress<EncodeProgress> encodeProgress, Progress<UploadProgress> uploadProgress,
+        public Task<string> ClipAndUpload(string originalFile, string clipName, IEnumerable<Segment> segments,
+            bool useGpu, Destination destination, Progress<EncodeProgress> encodeProgress,
+            Progress<UploadProgress> uploadProgress,
+            CancellationToken cancelToken)
+        {
+            Task EncodeAction(string outputFile) => _encoder.Encode(originalFile, outputFile, segments, useGpu, encodeProgress, cancelToken);
+            return ClipAndUpload(EncodeAction, clipName, destination, uploadProgress, cancelToken);
+        }
+
+        public Task<string> ClipAndUpload(IReadOnlyList<FileInfo> clips, string clipName, bool useGpu,
+            Destination destination, Progress<EncodeProgress> encodeProgress,
+            Progress<UploadProgress> uploadProgress, CancellationToken cancelToken)
+        {
+            Task EncodeAction(string outputFile) => _encoder.Encode(clips, outputFile, useGpu, encodeProgress, cancelToken);
+            return ClipAndUpload(EncodeAction, clipName, destination, uploadProgress, cancelToken);
+        }
+
+
+        private async Task<string> ClipAndUpload(Func<string, Task> encodeAction, string clipName,
+            Destination destination, Progress<UploadProgress> uploadProgress,
             CancellationToken cancelToken)
         {
             var outputFile = Path.GetTempFileName();
             try
             {
-                await _encoder.Encode(originalFile, outputFile, segments, useGpu, encodeProgress,
-                    cancelToken);
+                await encodeAction(outputFile);
                 if (destination == Destination.File)
                 {
                     var destFileName = Path.Combine(_settings.ShadowplayPath, clipName);
