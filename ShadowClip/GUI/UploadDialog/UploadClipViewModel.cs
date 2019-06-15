@@ -115,6 +115,7 @@ namespace ShadowClip.GUI.UploadDialog
         public bool OperationInProgress { get; set; }
         public bool DeleteOnSuccess { get; set; }
         public bool UseFfmpeg { get; set; }
+        public bool ForceWideScreen { get; set; }
 
         public string ErrorText { get; set; }
         public string YouTubeId { get; set; } = "";
@@ -205,6 +206,7 @@ namespace ShadowClip.GUI.UploadDialog
                     YouTubeId = await _clipCreator.ClipAndUpload(VideoFiles.Select(vf => vf.File).ToList(),
                         $"{SafeFileName}.mp4",
                         UseFfmpeg,
+                        ForceWideScreen,
                         SelectedDestination,
                         encodeProgress,
                         uploadProgress, _cancelToken.Token);
@@ -212,6 +214,7 @@ namespace ShadowClip.GUI.UploadDialog
                     YouTubeId = await _clipCreator.ClipAndUpload(OriginalFile.FullName, $"{SafeFileName}.mp4",
                         Segments,
                         UseFfmpeg,
+                        ForceWideScreen,
                         SelectedDestination,
                         encodeProgress,
                         uploadProgress, _cancelToken.Token);
@@ -267,12 +270,18 @@ namespace ShadowClip.GUI.UploadDialog
         protected override void OnActivate()
         {
             UseFfmpeg = _settings.UseFfmpeg;
+            ForceWideScreen = _settings.ForceWideScreen;
             SelectedDestination = _settings.Destination;
         }
 
         public void OnUseFfmpegChanged()
         {
             _settings.UseFfmpeg = UseFfmpeg;
+        }
+
+        public void OnForceWideScreenChanged()
+        {
+            _settings.ForceWideScreen = ForceWideScreen;
         }
 
         public void OnSelectedDestinationChanged()

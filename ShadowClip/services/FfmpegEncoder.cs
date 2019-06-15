@@ -99,7 +99,7 @@ namespace ShadowClip.services
         }
 
         public Task Encode(string originalFile, string outputFile, IEnumerable<Segment> segments,
-            bool useGpu, IProgress<EncodeProgress> encodeProgresss, CancellationToken cancelToken)
+            bool useGpu, bool forceWideScreen, IProgress<EncodeProgress> encodeProgresss, CancellationToken cancelToken)
         {
             var duration = segments.Sum(segment => (segment.End - segment.Start) / (double) segment.Speed);
 
@@ -135,7 +135,13 @@ namespace ShadowClip.services
                     }
                 }
 
-                concat += $"concat=n={segments.Count()}:v=1:a=1[final]";
+                concat += $"concat=n={segments.Count()}:v=1:a=1";
+                if (forceWideScreen)
+                {
+                    concat += "[temp];[temp] setdar=16/9";
+                }
+
+                concat += "[final]";
                 filter += concat;
 
                 var encoder = useGpu ? "h264_nvenc" : "libx264 ";
@@ -146,7 +152,7 @@ namespace ShadowClip.services
             }
         }
 
-        public async Task Encode(IReadOnlyList<FileInfo> clips, string outputFile, bool useGpu,
+        public async Task Encode(IReadOnlyList<FileInfo> clips, string outputFile, bool useGpu, bool forceWideScreen,
             Progress<EncodeProgress> encodeProgress,
             CancellationToken cancelToken)
         {
@@ -157,7 +163,13 @@ namespace ShadowClip.services
             string BuildFfmpegCommand()
             {
                 var filter = string.Join(" ", Enumerable.Range(0, clips.Count).Select(i => $"[{i}:v] [{i}:a] "));
-                filter += $"concat=n={clips.Count}:v=1:a=1[final]";
+                filter += $"concat=n={clips.Count}:v=1:a=1";
+                if (forceWideScreen)
+                {
+                    filter += "[temp];[temp] setdar=16/9";
+                }
+
+                filter += "[final]";
                 var encoder = useGpu ? "h264_nvenc" : "libx264 ";
                 var inputFiles = string.Join(" ", clips.Select(file => $"-i \"{file.FullName}\""));
                 var command =

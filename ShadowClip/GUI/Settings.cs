@@ -78,6 +78,12 @@ namespace ShadowClip.GUI
             set => _settings.UseFfmpeg = value;
         }
 
+        public bool ForceWideScreen
+        {
+            get => _settings.ForceWideScreen;
+            set => _settings.ForceWideScreen = value;
+        }
+
         public Destination Destination
         {
             get
@@ -102,6 +108,7 @@ namespace ShadowClip.GUI
         double Left { get; set; }
         double Top { get; set; }
         bool UseFfmpeg { get; set; }
+        bool ForceWideScreen { get; set; }
         Destination Destination { get; set; }
         void Save();
     }
