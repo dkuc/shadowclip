@@ -20,6 +20,7 @@ namespace ShadowClip.GUI
     public sealed class VideoViewModel : Screen, IHandle<FileSelected>
     {
         private readonly IDialogBuilder _dialogBuilder;
+        private readonly GifCreator _gifCreator;
         private readonly TimeSpan _frameTime = TimeSpan.FromTicks(166667);
         private readonly ISettings _settings;
         private readonly Stopwatch _stopwatch = new Stopwatch();
@@ -30,10 +31,12 @@ namespace ShadowClip.GUI
         private Task _setTask;
         private VideoView _videoView;
 
-        public VideoViewModel(IEventAggregator eventAggregator, ISettings settings, IDialogBuilder dialogBuilder)
+        public VideoViewModel(IEventAggregator eventAggregator, ISettings settings, IDialogBuilder dialogBuilder,
+            GifCreator gifCreator)
         {
             _settings = settings;
             _dialogBuilder = dialogBuilder;
+            _gifCreator = gifCreator;
             eventAggregator.Subscribe(this);
 
             Segments.CollectionChanged += SegmentsOnCollectionChanged;
@@ -396,6 +399,16 @@ namespace ShadowClip.GUI
         {
             if (_playingWhileClicked)
                 VideoPlayer.Play();
+        }
+
+        public async void MakeGif()
+        {
+            var frame1 = VideoPlayer.GetScreenShot(Zoom);
+            GoToNextFrame();
+            await Task.Delay(100);
+            var frame2 = VideoPlayer.GetScreenShot(Zoom);
+            _gifCreator.CreateGif(frame1, frame2);
+
         }
 
         public void Screenshot()

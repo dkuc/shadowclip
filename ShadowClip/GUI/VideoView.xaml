@@ -124,6 +124,7 @@
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                         <Button Content="Upload Clip" Name="Upload" />
                         <Button Content="Copy Screenshot" Name="Screenshot" />
+                        <Button Content="Create GIF" Name="MakeGif" ToolTip="Creates an animated GIF based on the current frame and the one that immediately follows it" />
                     </StackPanel>
                     <CheckBox Content="Software Render" IsChecked="{Binding IsSoftware}" HorizontalAlignment="Right"
                               VerticalAlignment="Bottom" ToolTip="Turn off hardware acceleration. May reduce video playbook issues." />
