@@ -19,9 +19,10 @@ namespace ShadowClip.GUI
 {
     public sealed class VideoViewModel : Screen, IHandle<FileSelected>
     {
+        private const int FrameTicks = 166667;
         private readonly IDialogBuilder _dialogBuilder;
         private readonly GifCreator _gifCreator;
-        private readonly TimeSpan _frameTime = TimeSpan.FromTicks(166667);
+        private readonly TimeSpan _frameTime = TimeSpan.FromTicks(FrameTicks);
         private readonly ISettings _settings;
         private readonly Stopwatch _stopwatch = new Stopwatch();
         private FileInfo _currentFile;
@@ -220,10 +221,8 @@ namespace ShadowClip.GUI
         private async Task SetPostionAwaitable(TimeSpan position)
         {
             
-            var ticksInSecond = 10000000;
-            var ticksInFrame = ticksInSecond / 60.0;
-            var currentFrame = (int)Math.Floor(Position.Ticks / ticksInFrame);
-            var nextFrame = (int)Math.Floor(position.Ticks / ticksInFrame);
+            var currentFrame = (int)Math.Floor(Position.Ticks / (double)FrameTicks);
+            var nextFrame = (int)Math.Floor(position.Ticks / (double)FrameTicks);
 
             if (currentFrame == nextFrame)
             {
@@ -259,7 +258,8 @@ namespace ShadowClip.GUI
             }
 
             VideoPlayer.Pause();
-            VideoPlayer.Position = _newestPosition;
+            var desiredFrame = (long)Math.Floor(_newestPosition.Ticks / (double)FrameTicks);
+            VideoPlayer.Position = TimeSpan.FromTicks(desiredFrame * FrameTicks + FrameTicks / 10);//Go to the frame plus 10% of a frame
             NotifyOfPropertyChange(() => CurrentMediaState);
             NotifyOfPropertyChange(() => CurrentPosition);
             NotifyOfPropertyChange(() => Zoom);
@@ -352,14 +352,13 @@ namespace ShadowClip.GUI
 
                 var newPosition = args.GetPosition(_videoView).X;
                 var delta = newPosition - previousPosition;
-                
                 var videoTimeDelta = TimeSpan.FromTicks((long) (delta * 10000));
 
-                var initialVideoPosition = Position.Ticks;
-                SetPostion(Position + videoTimeDelta);
-
-                if (initialVideoPosition != Position.Ticks)
-                    previousPosition = newPosition; //SetPosition succeeded, record mouse position at the time
+                if (Math.Abs(videoTimeDelta.Ticks) > FrameTicks)
+                {
+                    SetPostion(Position + videoTimeDelta);
+                    previousPosition = newPosition;
+                }
 
             };
 
