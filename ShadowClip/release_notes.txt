@@ -1,4 +1,6 @@
-﻿* Added option to force 16:9 aspect ratio to eliminate black bars.
+﻿* Added ability to create two frame gifs
+* Increased accuracy of frame navigation with left and right arrow keys
+* Added option to force 16:9 aspect ratio to eliminate black bars.
 * Added ability to combine clips.
 * Fixed video freeze when video scrubbing when speed is set to < 1
 * Fixed video freeze when advancing less than one whole frame
