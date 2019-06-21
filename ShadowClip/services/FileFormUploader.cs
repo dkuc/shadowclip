@@ -15,7 +15,7 @@ namespace ShadowClip.services
         {
             using (var file = File.OpenRead(filePath))
             {
-                var httpClient = new HttpClient();
+                var httpClient = new HttpClient {Timeout = TimeSpan.FromMinutes(10)};
                 var form = new MultipartFormDataContent();
 
                 var progressableStreamContent = new ProgressableStreamContent(file, uploadProgress);
