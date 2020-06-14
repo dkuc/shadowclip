@@ -1,4 +1,5 @@
-﻿* Increased http timeout for people with slow connections.
+﻿* Fix thumbnails: Ensure thumbnail directory exists
+* Increased http timeout for people with slow connections.
 * Added ability to create two frame gifs
 * Increased accuracy of frame navigation with left and right arrow keys
 * Added option to force 16:9 aspect ratio to eliminate black bars.
