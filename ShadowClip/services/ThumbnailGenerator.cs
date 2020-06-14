@@ -20,6 +20,8 @@ namespace ShadowClip.services
 
         public async Task Generate(FileInfo file)
         {
+            Directory.CreateDirectory(_thumbnailPath);
+
             _previousCall = _previousCall == null ? CreateThumbnail(file) : CreateThumbnailDeferred(file);
 
             await _previousCall;
