@@ -146,7 +146,7 @@ namespace ShadowClip.services
 
                 var encoder = useGpu ? "h264_nvenc" : "libx264 ";
                 var command =
-                    $"-nostdin -i \"{originalFile}\" -c:v {encoder} -filter_complex \"{filter}\"  -global_quality:v 33 -movflags faststart -f mp4 -y -map [final] \"{outputFile}\"";
+                    $"-nostdin -i \"{originalFile}\" -c:v {encoder} -filter_complex \"{filter}\"  -global_quality:v 25 -movflags faststart -f mp4 -y -map [final] \"{outputFile}\"";
                 Console.WriteLine(command);
                 return command;
             }
