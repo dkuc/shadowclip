@@ -11,6 +11,32 @@ using ShadowClip.services;
 
 namespace ShadowClip.GUI
 {
+    internal class TimeSpanToSecondsConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            switch (value)
+            {
+                case TimeSpan span:
+                    return span.TotalSeconds;
+                case Duration duration:
+                    return duration.HasTimeSpan ? duration.TimeSpan.TotalSeconds : 0d;
+                default:
+                    return 0d;
+            }
+        }
+        
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (value is double == false) return 0d;
+            var result = TimeSpan.FromTicks(System.Convert.ToInt64(TimeSpan.TicksPerSecond * (double)value));
+
+            // Do the conversion from visibility to bool
+            if (targetType == typeof(TimeSpan)) return result;
+            return targetType == typeof(Duration) ?
+                new Duration(result) : Activator.CreateInstance(targetType);
+        }
+    }
     internal class VideoZoomConverter : IMultiValueConverter
     {
         public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
@@ -165,14 +191,11 @@ namespace ShadowClip.GUI
         }
     }
 
-    internal class PlayActionCoverter : SimpleConverter<MediaState>
+    internal class PlayActionCoverter : SimpleConverter<bool>
     {
-        public override object Convert(MediaState mediaState)
+        public override object Convert(bool mediaState)
         {
-            if (mediaState == MediaState.Play)
-                return "Pause";
-
-            return "Play";
+            return mediaState ? "Pause" : "Play";
         }
     }
 

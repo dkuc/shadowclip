@@ -6,6 +6,7 @@
              xmlns:cal="http://www.caliburnproject.org"
              xmlns:gui="clr-namespace:ShadowClip.GUI"
              xmlns:controls="clr-namespace:ShadowClip.GUI.Controls"
+             xmlns:ffme="clr-namespace:Unosquare.FFME;assembly=ffme.win"
              mc:Ignorable="d"
              d:DesignHeight="300" d:DesignWidth="700">
     <UserControl.Resources>
@@ -13,6 +14,7 @@
         <gui:PlayActionCoverter x:Key="PlayActionCoverter" />
         <gui:IntegerSecondsConverter x:Key="IntegerSecondsConverter" />
         <gui:VideoZoomConverter x:Key="VideoZoomConverter" />
+        <gui:TimeSpanToSecondsConverter x:Key="TimeSpanToSecondsConverter" />
     </UserControl.Resources>
     <Grid cal:Message.Attach="[Event PreviewKeyDown] = [Action KeyPressed($eventArgs)]">
         <Grid.RowDefinitions>
@@ -20,17 +22,18 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
         <Canvas ClipToBounds="True" Name="VideoCanvas">
-            <MediaElement Name="Video"
+            <ffme:MediaElement Name="Video"
                           MinWidth="300"
                           ScrubbingEnabled="True"
                           LoadedBehavior="Manual"
                           ClipToBounds="True"
+                          Background="Transparent"
                           Height="{Binding ElementName=VideoCanvas, Path=ActualHeight}"
                           Width="{Binding ElementName=VideoCanvas, Path=ActualWidth}"
-                          IsMuted="{Binding IsMuted}"
+                          IsMuted="{Binding IsMuted, Mode=TwoWay}"
                           cal:Message.Attach="[Event MouseDown] = [Action VideoClicked($eventArgs)];">
 
-                <MediaElement.RenderTransform>
+                <ffme:MediaElement.RenderTransform>
                     <ScaleTransform ScaleX="{Binding Zoom}" ScaleY="{Binding Zoom}">
                         <ScaleTransform.CenterY>
                             <MultiBinding Converter="{StaticResource VideoZoomConverter}" ConverterParameter="height">
@@ -49,8 +52,8 @@
                             </MultiBinding>
                         </ScaleTransform.CenterX>
                     </ScaleTransform>
-                </MediaElement.RenderTransform>
-            </MediaElement>
+                </ffme:MediaElement.RenderTransform>
+            </ffme:MediaElement>
         </Canvas>
         <Grid Grid.Row="1">
             <StackPanel>
@@ -61,7 +64,7 @@
                         <ColumnDefinition Width="auto" />
                     </Grid.ColumnDefinitions>
                     <StackPanel MinWidth="92">
-                        <Button Content="{Binding CurrentMediaState, Converter={StaticResource PlayActionCoverter}}"
+                        <Button Content="{Binding IsPlaying, Converter={StaticResource PlayActionCoverter}}"
                                 Name="TogglePlay" MinWidth="40" />
                         <StackPanel Orientation="Horizontal">
                             <TextBlock Text="Speed:" />
@@ -86,8 +89,11 @@
                             cal:Message.Attach="
                             [Event PreviewMouseDown] = [Action SliderClicked()];
                             [Event PreviewMouseUp] = [Action SliderReleased()]"
-                            Maximum="{Binding Duration, Converter={StaticResource MaxLength}}"
-                            Value="{Binding CurrentPosition, Delay=15}" HorizontalAlignment="Stretch"
+                            SmallChange="{Binding VideoPlayer.PositionStep, Converter={StaticResource TimeSpanToSecondsConverter}}"
+                            LargeChange="{Binding VideoPlayer.PositionStep, Converter={StaticResource TimeSpanToSecondsConverter}}"
+                            Minimum="{Binding VideoPlayer.PlaybackStartTime, Converter={StaticResource TimeSpanToSecondsConverter}}"
+                            Maximum="{Binding VideoPlayer.PlaybackEndTime, Converter={StaticResource TimeSpanToSecondsConverter}}" 
+                            Value="{Binding VideoPlayer.Position, Converter={StaticResource TimeSpanToSecondsConverter}}"
                             IsMoveToPointEnabled="True" />
                     <StackPanel Grid.Row="0" Grid.Column="2" HorizontalAlignment="Center">
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">

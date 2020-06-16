@@ -1,9 +1,8 @@
 ﻿using System;
-using System.Reflection;
 using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using MediaElement = Unosquare.FFME.MediaElement;
 
 namespace ShadowClip.GUI
 {
@@ -13,20 +12,6 @@ namespace ShadowClip.GUI
         {
             return TimeSpan.FromTicks((long) (value * 10_000_000));
         }
-
-        //Nasty Hack because microsoft only allows the media state to be observed in Windows 10 Universal apps, not WPF
-        public static MediaState GetMediaState(this MediaElement mediaElement)
-        {
-            var hlp = typeof(MediaElement).GetField("_helper", BindingFlags.NonPublic | BindingFlags.Instance);
-            // ReSharper disable once PossibleNullReferenceException
-            var helperObject = hlp.GetValue(mediaElement);
-            var stateField = helperObject.GetType()
-                .GetField("_currentState", BindingFlags.NonPublic | BindingFlags.Instance);
-            // ReSharper disable once PossibleNullReferenceException
-            var state = (MediaState) stateField.GetValue(helperObject);
-            return state;
-        }
-
         public static BitmapSource GetScreenShot(this MediaElement source, int zoom)
         {
             var scale = source.NaturalVideoHeight / source.RenderSize.Height;

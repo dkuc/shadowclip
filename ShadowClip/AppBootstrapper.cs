@@ -6,6 +6,7 @@ using Caliburn.Micro;
 using Microsoft.Practices.Unity;
 using ShadowClip.GUI;
 using ShadowClip.services;
+using Unosquare.FFME;
 
 namespace ShadowClip
 {
@@ -15,6 +16,7 @@ namespace ShadowClip
 
         public AppBootstrapper()
         {
+            Library.FFmpegDirectory = "ffmpeg_binaries";
             Initialize();
         }
 

@@ -1,36 +1,30 @@
 using System;
 using System.Collections.Specialized;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Input;
-using System.Windows.Threading;
 using Caliburn.Micro;
 using ShadowClip.GUI.Controls;
 using ShadowClip.GUI.UploadDialog;
 using ShadowClip.services;
+using Unosquare.FFME.Common;
+using MediaElement = Unosquare.FFME.MediaElement;
 
 namespace ShadowClip.GUI
 {
     public sealed class VideoViewModel : Screen, IHandle<FileSelected>
     {
-        private const int FrameTicks = 166667;
         private readonly IDialogBuilder _dialogBuilder;
         private readonly GifCreator _gifCreator;
-        private readonly TimeSpan _frameTime = TimeSpan.FromTicks(FrameTicks);
         private readonly ISettings _settings;
-        private readonly Stopwatch _stopwatch = new Stopwatch();
         private FileInfo _currentFile;
-        private TimeSpan _newestPosition;
         private bool _playingWhileClicked;
-        private DispatcherTimer _previewTimer;
-        private Task _setTask;
         private VideoView _videoView;
+        private Segment _previewSegment;
 
         public VideoViewModel(IEventAggregator eventAggregator, ISettings settings, IDialogBuilder dialogBuilder,
             GifCreator gifCreator)
@@ -42,7 +36,6 @@ namespace ShadowClip.GUI
 
             Segments.CollectionChanged += SegmentsOnCollectionChanged;
             Segments.Add(new Segment {Start = 0, End = 60, Speed = 1, Zoom = 1});
-            _stopwatch.Start();
         }
 
         public BindableCollection<Segment> Segments { get; set; } = new BindableCollection<Segment>();
@@ -69,9 +62,13 @@ namespace ShadowClip.GUI
 
         public MediaElement VideoPlayer => _videoView.Video;
 
-        public MediaState CurrentMediaState => VideoPlayer.GetMediaState();
+        public bool IsPlaying => VideoPlayer.IsPlaying;
 
-        public TimeSpan Position => VideoPlayer.Position;
+        public TimeSpan Position
+        {
+            get => VideoPlayer.Position;
+            set => VideoPlayer.Position = value;
+        }
 
         public Segment FirstSegment => Segments.First();
         public Segment FinalSegment => Segments.Last();
@@ -94,9 +91,7 @@ namespace ShadowClip.GUI
             }
         }
 
-        public TimeSpan Duration => VideoPlayer.NaturalDuration.HasTimeSpan
-            ? VideoPlayer.NaturalDuration.TimeSpan
-            : TimeSpan.Zero;
+        public TimeSpan Duration => VideoPlayer.NaturalDuration ?? TimeSpan.Zero;
 
         public TimeSpan StartPosition
         {
@@ -114,22 +109,19 @@ namespace ShadowClip.GUI
         {
             get => Position.TotalSeconds;
 
-            set => SetPostion(value.ToTimeSpan());
+            set => Position = value.ToTimeSpan();
         }
 
-        public void Handle(FileSelected message)
+        public async void Handle(FileSelected message)
         {
             _currentFile = message.File;
             if (message.File == null)
             {
-                VideoPlayer.Source = null;
+                await VideoPlayer.Close();
                 return;
             }
 
-            VideoPlayer.Source = new Uri(message.File.FullName);
-            VideoPlayer.Play();
-            SetPostion(TimeSpan.Zero);
-            VideoPlayer.Pause();
+            await VideoPlayer.Open(new Uri(message.File.FullName));
         }
 
         private void SegmentsOnCollectionChanged(object o, NotifyCollectionChangedEventArgs args)
@@ -178,9 +170,9 @@ namespace ShadowClip.GUI
             var segment = (Segment) o;
             var propertyName = propertyChangedEventArgs.PropertyName;
             if (propertyName == "Start")
-                SetPostion(segment.Start.ToTimeSpan());
+                Position = segment.Start.ToTimeSpan();
             if (propertyName == "End" && segment == FinalSegment)
-                SetPostion(segment.End.ToTimeSpan());
+                Position = segment.End.ToTimeSpan();
         }
 
         public void OnIsMutedChanged()
@@ -212,97 +204,38 @@ namespace ShadowClip.GUI
             EndPosition = Position;
         }
 
-        //This method only exists to avoid compiler warnings 
-        private async void SetPostion(TimeSpan position)
-        {
-            await SetPostionAwaitable(position);
-        }
-
-        private async Task SetPostionAwaitable(TimeSpan position)
-        {
-            
-            var currentFrame = (int)Math.Floor(Position.Ticks / (double)FrameTicks);
-            var nextFrame = (int)Math.Floor(position.Ticks / (double)FrameTicks);
-
-            if (currentFrame == nextFrame)
-            {
-                return;
-            }
-
-            _newestPosition = position;
-            if (_setTask != null)
-                return;
-
-            //There is a glitch in the video player that can cause it to freeze
-            //when the position is changed while the speed ratio is not 1.
-            //In order to set the speed ratio, the video must me playing.
-            if (Math.Abs(VideoPlayer.SpeedRatio - 1) > .001)
-            {
-
-                if (CurrentMediaState == MediaState.Play)
-                {
-                    VideoPlayer.SpeedRatio = 1;
-                    VideoPlayer.Pause();
-
-                    _setTask = Task.Delay(32); //Give the video player time to switch speeds before scrubbing
-                    await _setTask;
-                    _setTask = null;
-
-                }
-                else
-                {
-                    VideoPlayer.Play();
-                    VideoPlayer.SpeedRatio = 1;
-                }
-                
-            }
-
-            VideoPlayer.Pause();
-            var desiredFrame = (long)Math.Floor(_newestPosition.Ticks / (double)FrameTicks);
-            VideoPlayer.Position = TimeSpan.FromTicks(desiredFrame * FrameTicks + FrameTicks / 10);//Go to the frame plus 10% of a frame
-            NotifyOfPropertyChange(() => CurrentMediaState);
-            NotifyOfPropertyChange(() => CurrentPosition);
-            NotifyOfPropertyChange(() => Zoom);
-        }
-
         protected override void OnViewAttached(object view, object context)
         {
             _videoView = (VideoView) view;
-            VideoPlayer.MediaOpened += VideoPlayerOnMediaOpened;
-
             IsMuted = _settings.IsMuted;
 
-            var timer = new DispatcherTimer {Interval = TimeSpan.FromSeconds(.5)};
-            timer.Tick += (sender, args) =>
-            {
-                NotifyOfPropertyChange("");
-                if (Speed != (decimal) VideoPlayer.SpeedRatio) SetVideoSpeed(Speed);
-            };
-            timer.Start();
+            //ToDo: Change these events to Caliburn messages
+            VideoPlayer.MediaOpened += VideoPlayerOnMediaOpened;
+            VideoPlayer.MediaStateChanged += VideoPlayerOnMediaStateChanged;
+            VideoPlayer.PositionChanged += VideoPlayerOnPositionChanged;
         }
 
-
-        private void VideoPlayerOnMediaOpened(object sender, RoutedEventArgs routedEventArgs)
+        private void VideoPlayerOnMediaOpened(object sender, MediaOpenedEventArgs mediaOpenedEventArgs)
         {
             Segments.RemoveRange(Segments.Except(new[] {FirstSegment}).ToList());
             StartPosition = TimeSpan.Zero;
-            var duration = VideoPlayer.NaturalDuration;
-            EndPosition = duration.HasTimeSpan ? duration.TimeSpan : TimeSpan.Zero;
+            var duration = VideoPlayer.NaturalDuration ?? TimeSpan.Zero;
+            EndPosition = duration;
             CurrentPosition = 0;
         }
 
-        public void TogglePlay()
+        public async void TogglePlay()
         {
-            if (CurrentMediaState == MediaState.Play)
-                VideoPlayer.Pause();
+            if (IsPlaying)
+                await VideoPlayer.Pause();
             else
             {
                 SetVideoSpeed(Speed);
-                VideoPlayer.Play();
+                await VideoPlayer.Play();
                 
             }
 
-            NotifyOfPropertyChange(() => CurrentMediaState);
+            NotifyOfPropertyChange(() => IsPlaying);
         }
 
         public void Upload()
@@ -311,14 +244,14 @@ namespace ShadowClip.GUI
                 _dialogBuilder.BuildDialog<UploadClipViewModel>(new UploadData(_currentFile, Segments));
         }
 
-        public void GoToNextFrame()
+        public async void GoToNextFrame()
         {
-            SetPostion(Position.Add(_frameTime));
+            await VideoPlayer.StepForward();
         }
 
-        public void GoToPreviousFrame()
+        public async void GoToPreviousFrame()
         {
-            SetPostion(Position.Subtract(_frameTime));
+            await VideoPlayer.StepBackward();
         }
 
         public void KeyPressed(KeyEventArgs keyEvent)
@@ -353,12 +286,9 @@ namespace ShadowClip.GUI
                 var newPosition = args.GetPosition(_videoView).X;
                 var delta = newPosition - previousPosition;
                 var videoTimeDelta = TimeSpan.FromTicks((long) (delta * 10000));
-
-                if (Math.Abs(videoTimeDelta.Ticks) > FrameTicks)
-                {
-                    SetPostion(Position + videoTimeDelta);
-                    previousPosition = newPosition;
-                }
+                Position = Position + videoTimeDelta;
+                previousPosition = newPosition;
+                
 
             };
 
@@ -391,7 +321,7 @@ namespace ShadowClip.GUI
 
         public void SliderClicked()
         {
-            _playingWhileClicked = CurrentMediaState == MediaState.Play;
+            _playingWhileClicked = IsPlaying;
         }
 
         public void SliderReleased()
@@ -421,25 +351,32 @@ namespace ShadowClip.GUI
         {
             var segment = clickEvent.Segment;
             var start = segment.Start;
-            var end = segment.End;
-            await SetPostionAwaitable(start.ToTimeSpan());
-            SetVideoSpeed(Speed);
-            VideoPlayer.Play();
+            await VideoPlayer.Seek(start.ToTimeSpan());
+            SetVideoSpeed(segment.Speed);
+            _previewSegment = segment;
+            await VideoPlayer.Play();
 
-            _previewTimer?.Stop();
-            _previewTimer = new DispatcherTimer {Interval = TimeSpan.FromMilliseconds(16)};
+            _previewSegment = segment;
 
-            _previewTimer.Tick += (sender, args) =>
-            {
-                if (CurrentMediaState != MediaState.Play)
-                    _previewTimer.Stop();
-                if (VideoPlayer.Position >= end.ToTimeSpan())
-                {
+        }
+        private void VideoPlayerOnPositionChanged(object sender, PositionChangedEventArgs e)
+        {
+            if(_previewSegment != null)
+                if (e.Position >= _previewSegment.End.ToTimeSpan())
                     VideoPlayer.Pause();
-                    _previewTimer.Stop();
-                }
-            };
-            _previewTimer.Start();
+
+            if (Speed != (decimal) VideoPlayer.SpeedRatio)
+                SetVideoSpeed(Speed);
+            NotifyOfPropertyChange("");
+        }
+
+        private void VideoPlayerOnMediaStateChanged(object sender, MediaStateChangedEventArgs e)
+        {
+            NotifyOfPropertyChange("");
+            if (e.MediaState != MediaPlaybackState.Play)
+            {
+                _previewSegment = null;
+            }
         }
     }
 }
