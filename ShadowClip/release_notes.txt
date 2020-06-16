@@ -1,4 +1,5 @@
-﻿* Change video play back to FFMpeg video engine(faster, less crashes)
+﻿* Increase GPU encode quality (6Mbps -> 15 Mbps)
+* Change video play back to FFMpeg video engine(faster, less crashes)
 * Fix thumbnails: Ensure thumbnail directory exists
 * Increased http timeout for people with slow connections.
 * Added ability to create two frame gifs
