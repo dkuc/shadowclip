@@ -1,4 +1,5 @@
-﻿* Fix thumbnails: Ensure thumbnail directory exists
+﻿* Change video play back to FFMpeg video engine(faster, less crashes)
+* Fix thumbnails: Ensure thumbnail directory exists
 * Increased http timeout for people with slow connections.
 * Added ability to create two frame gifs
 * Increased accuracy of frame navigation with left and right arrow keys
