@@ -185,6 +185,21 @@ namespace ShadowClip.GUI
             }
         }
 
+        public void DeleteSingle(VideoFile video)
+        {
+            try
+            {
+                var dialogResult = MessageBox.Show("Are you sure you want to delete this video?",
+                    "Delete Files",
+                    MessageBoxButtons.OKCancel);
+                if (dialogResult == DialogResult.OK)
+                    DeleteAndUnselect(video);
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show("It didn't work: " + e.Message);
+            }
+        }
         public void Delete()
         {
             try
