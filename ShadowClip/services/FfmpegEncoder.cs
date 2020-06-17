@@ -195,7 +195,7 @@ namespace ShadowClip.services
                     RedirectStandardOutput = true,
                     UseShellExecute = false,
                     CreateNoWindow = true,
-                    FileName = @"ffmpeg.exe",
+                    FileName = @"ffmpeg_binaries/ffmpeg.exe",
                     Arguments = $"-i \"{videoFilePath}\""
                 }
             };
