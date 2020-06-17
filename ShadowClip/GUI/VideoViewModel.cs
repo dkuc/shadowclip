@@ -117,7 +117,8 @@ namespace ShadowClip.GUI
             _currentFile = message.File;
             if (message.File == null)
             {
-                await VideoPlayer.Close();
+                //Block so delete happens after close
+                VideoPlayer.Close().GetAwaiter().GetResult();
                 return;
             }
 
