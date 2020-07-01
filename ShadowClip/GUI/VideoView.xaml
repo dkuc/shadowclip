@@ -114,18 +114,6 @@
                     </StackPanel>
 
                 </Grid>
-                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                    <Button Content="Mark Start" Name="MarkStart" />
-                    <TextBlock Text="Start: " />
-                    <TextBlock HorizontalAlignment="Right"
-                               Text="{Binding StartPosition, Converter={StaticResource IntegerSecondsConverter}}"
-                               MinWidth="30" />
-                    <Button Content="Mark End" Name="MarkEnd" />
-                    <TextBlock Text="End: " />
-                    <TextBlock HorizontalAlignment="Right"
-                               Text="{Binding EndPosition,  Converter={StaticResource IntegerSecondsConverter}}"
-                               MinWidth="30" />
-                </StackPanel>
                 <Grid>
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                         <Button Content="Upload Clip" Name="Upload" />

@@ -93,18 +93,6 @@ namespace ShadowClip.GUI
 
         public TimeSpan Duration => VideoPlayer.NaturalDuration ?? TimeSpan.Zero;
 
-        public TimeSpan StartPosition
-        {
-            get => FirstSegment.Start.ToTimeSpan();
-            set => FirstSegment.Start = value.TotalSeconds;
-        }
-
-        public TimeSpan EndPosition
-        {
-            get => FinalSegment.End.ToTimeSpan();
-            set => FirstSegment.End = value.TotalSeconds;
-        }
-
         public double CurrentPosition
         {
             get => Position.TotalSeconds;
@@ -195,16 +183,6 @@ namespace ShadowClip.GUI
             VideoPlayer.SpeedRatio = (double) speed;
         }
 
-        public void MarkStart()
-        {
-            StartPosition = Position;
-        }
-
-        public void MarkEnd()
-        {
-            EndPosition = Position;
-        }
-
         protected override void OnViewAttached(object view, object context)
         {
             _videoView = (VideoView) view;
@@ -219,9 +197,6 @@ namespace ShadowClip.GUI
         private void VideoPlayerOnMediaOpened(object sender, MediaOpenedEventArgs mediaOpenedEventArgs)
         {
             Segments.RemoveRange(Segments.Except(new[] {FirstSegment}).ToList());
-            StartPosition = TimeSpan.Zero;
-            var duration = VideoPlayer.NaturalDuration ?? TimeSpan.Zero;
-            EndPosition = duration;
             CurrentPosition = 0;
         }
 
