@@ -201,8 +201,14 @@ namespace ShadowClip.GUI.Controls
             var index = 0;
             foreach (var segment in Segments)
             {
-                segment.Start = starColumns.Take(index + 1).Sum(cd => cd.Width.Value) / usableWidth * Duration;
-                segment.End = starColumns.Take(index + 2).Sum(cd => cd.Width.Value) / usableWidth * Duration;
+                var newStart = starColumns.Take(index + 1).Sum(cd => cd.Width.Value) / usableWidth * Duration;
+                var newEnd = starColumns.Take(index + 2).Sum(cd => cd.Width.Value) / usableWidth * Duration;
+                
+                if(Math.Abs(segment.Start - newStart) > 0.001)
+                    segment.Start = newStart;
+
+                if (Math.Abs(segment.End - newEnd) > 0.001)
+                    segment.End = newEnd;
 
                 index++;
             }
