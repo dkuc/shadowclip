@@ -23,15 +23,15 @@
         </Grid.RowDefinitions>
         <Canvas ClipToBounds="True" Name="VideoCanvas">
             <ffme:MediaElement Name="Video"
-                          MinWidth="300"
-                          ScrubbingEnabled="True"
-                          LoadedBehavior="Manual"
-                          ClipToBounds="True"
-                          Background="Transparent"
-                          Height="{Binding ElementName=VideoCanvas, Path=ActualHeight}"
-                          Width="{Binding ElementName=VideoCanvas, Path=ActualWidth}"
-                          IsMuted="{Binding IsMuted, Mode=TwoWay}"
-                          cal:Message.Attach="[Event MouseDown] = [Action VideoClicked($eventArgs)];">
+                               MinWidth="300"
+                               ScrubbingEnabled="True"
+                               LoadedBehavior="Manual"
+                               ClipToBounds="True"
+                               Background="Transparent"
+                               Height="{Binding ElementName=VideoCanvas, Path=ActualHeight}"
+                               Width="{Binding ElementName=VideoCanvas, Path=ActualWidth}"
+                               IsMuted="{Binding IsMuted, Mode=TwoWay}"
+                               cal:Message.Attach="[Event MouseDown] = [Action VideoClicked($eventArgs)];">
 
                 <ffme:MediaElement.RenderTransform>
                     <ScaleTransform ScaleX="{Binding Zoom}" ScaleY="{Binding Zoom}">
@@ -82,19 +82,44 @@
                             <Button Name="AddSegment" Content="+" />
                         </StackPanel>
                     </StackPanel>
-                    <controls:SegmentControl Grid.Column="1" Height="40" DurationTime="{Binding Duration}"
-                                             Segments="{Binding Segments}"
-                                             cal:Message.Attach="[Event Clicked] = [Action PreviewClicked($eventArgs)]" />
-                    <Slider Grid.Row="0" Grid.Column="1" Name="VideoSlider" VerticalAlignment="Top"
-                            cal:Message.Attach="
+                    <StackPanel Grid.Column="1">
+                        <Slider Name="VideoSlider" VerticalAlignment="Top"
+                                cal:Message.Attach="
                             [Event PreviewMouseDown] = [Action SliderClicked()];
                             [Event PreviewMouseUp] = [Action SliderReleased()]"
-                            SmallChange="{Binding VideoPlayer.PositionStep, Converter={StaticResource TimeSpanToSecondsConverter}}"
-                            LargeChange="{Binding VideoPlayer.PositionStep, Converter={StaticResource TimeSpanToSecondsConverter}}"
-                            Minimum="{Binding VideoPlayer.PlaybackStartTime, Converter={StaticResource TimeSpanToSecondsConverter}}"
-                            Maximum="{Binding VideoPlayer.PlaybackEndTime, Converter={StaticResource TimeSpanToSecondsConverter}}" 
-                            Value="{Binding VideoPlayer.Position, Converter={StaticResource TimeSpanToSecondsConverter}}"
-                            IsMoveToPointEnabled="True" />
+                                SmallChange="{Binding VideoPlayer.PositionStep, Converter={StaticResource TimeSpanToSecondsConverter}}"
+                                LargeChange="{Binding VideoPlayer.PositionStep, Converter={StaticResource TimeSpanToSecondsConverter}}"
+                                Minimum="{Binding VideoPlayer.PlaybackStartTime, Converter={StaticResource TimeSpanToSecondsConverter}}"
+                                Maximum="{Binding VideoPlayer.PlaybackEndTime, Converter={StaticResource TimeSpanToSecondsConverter}}"
+                                Value="{Binding VideoPlayer.Position, Converter={StaticResource TimeSpanToSecondsConverter}}"
+                                IsMoveToPointEnabled="True" />
+
+                        <ListBox Name="Timelines">
+                            <ListBox.ItemContainerStyle>
+                                <Style TargetType="ListBoxItem">
+                                    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                                    <Style.Triggers>
+                                        <Trigger Property="IsSelected" Value="True">
+                                            <Setter Property="FontWeight" Value="Bold" />
+                                        </Trigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </ListBox.ItemContainerStyle>
+                            <ListBox.ItemTemplate>
+                                <DataTemplate>
+                                    <StackPanel>
+                                        <controls:SegmentControl Height="40"
+                                                                 DurationTime="{Binding DataContext.Duration, RelativeSource={RelativeSource Mode=FindAncestor,
+                                                               AncestorType={x:Type ItemsControl}}}"
+                                                                 Segments="{Binding}"
+                                                                 cal:Message.Attach="[Event Clicked] = [Action PreviewClicked($eventArgs)]" />
+                                    </StackPanel>
+
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+
+                        </ListBox>
+                    </StackPanel>
                     <StackPanel Grid.Row="0" Grid.Column="2" HorizontalAlignment="Center">
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                             <TextBlock Text="{Binding Position, StringFormat=mm\\:ss}" />
@@ -110,7 +135,11 @@
                                 <ComboBoxItem Tag="4">4x</ComboBoxItem>
                             </ComboBox>
                         </StackPanel>
-
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="{Binding Timelines.Count, StringFormat='Timelines: {0}'}" />
+                            <Button Name="RemoveTimeLine" Content="-" />
+                            <Button Name="AddTimeline" Content="+" />
+                        </StackPanel>
                     </StackPanel>
 
                 </Grid>
@@ -118,10 +147,12 @@
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                         <Button Content="Upload Clip" Name="Upload" />
                         <Button Content="Copy Screenshot" Name="Screenshot" />
-                        <Button Content="Create GIF" Name="MakeGif" ToolTip="Creates an animated GIF based on the current frame and the one that immediately follows it" />
+                        <Button Content="Create GIF" Name="MakeGif"
+                                ToolTip="Creates an animated GIF based on the current frame and the one that immediately follows it" />
                     </StackPanel>
                     <CheckBox Content="Software Render" IsChecked="{Binding IsSoftware}" HorizontalAlignment="Right"
-                              VerticalAlignment="Bottom" ToolTip="Turn off hardware acceleration. May reduce video playbook issues." />
+                              VerticalAlignment="Bottom"
+                              ToolTip="Turn off hardware acceleration. May reduce video playbook issues." />
                 </Grid>
             </StackPanel>
 

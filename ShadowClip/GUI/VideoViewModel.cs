@@ -33,13 +33,15 @@ namespace ShadowClip.GUI
             _dialogBuilder = dialogBuilder;
             _gifCreator = gifCreator;
             eventAggregator.Subscribe(this);
-
-            Segments.CollectionChanged += SegmentsOnCollectionChanged;
-            Segments.Add(new Segment {Start = 0, End = 60, Speed = 1, Zoom = 1});
+            AddTimeline();
         }
 
-        public BindableCollection<Segment> Segments { get; set; } = new BindableCollection<Segment>();
+        public SegmentCollection Segments => SelectedTimeline ?? Timelines.First();
 
+        public BindableCollection<SegmentCollection> Timelines { get; } = new BindableCollection<SegmentCollection>();
+        
+        public SegmentCollection SelectedTimeline { get; set; }
+        
         public int Zoom
         {
             get => CurrentSegment.Zoom;
@@ -143,7 +145,7 @@ namespace ShadowClip.GUI
                 CurrentSegment.Start = CurrentPosition;
             }
 
-            var newSegment = new Segment {Start = newSegStart, End = newSegEnd, Speed = 1, Zoom = 1};
+            var newSegment = new Segment(Segments) {Start = newSegStart, End = newSegEnd, Speed = 1, Zoom = 1};
             
             Segments.Insert(Segments.IndexOf(CurrentSegment), newSegment);
         }
@@ -153,6 +155,24 @@ namespace ShadowClip.GUI
             if (Segments.Count > 1)
                 Segments.RemoveAt(Segments.Count - 1);
         }
+        
+        public void AddTimeline()
+        {
+            if (Timelines.Count < 6)
+            {
+                var segmentCollection = new SegmentCollection();
+                segmentCollection.CollectionChanged += SegmentsOnCollectionChanged;
+                segmentCollection.Add(new Segment(segmentCollection) {Start = 0, End = 90, Speed = 1, Zoom = 1});
+                Timelines.Add(segmentCollection);
+                SelectedTimeline = segmentCollection;
+            }
+        }
+
+        public void RemoveTimeline()
+        {
+            if (Timelines.Count > 1)
+                Timelines.RemoveAt(Timelines.Count - 1);
+        }
 
         private void SegmentChanged(object o, PropertyChangedEventArgs propertyChangedEventArgs)
         {
@@ -160,7 +180,7 @@ namespace ShadowClip.GUI
             var propertyName = propertyChangedEventArgs.PropertyName;
             if (propertyName == "Start")
                 Position = segment.Start.ToTimeSpan();
-            if (propertyName == "End" && segment == FinalSegment)
+            if (propertyName == "End" && segment.IsLast)
                 Position = segment.End.ToTimeSpan();
         }
 
@@ -217,7 +237,7 @@ namespace ShadowClip.GUI
         public void Upload()
         {
             if (_currentFile != null)
-                _dialogBuilder.BuildDialog<UploadClipViewModel>(new UploadData(_currentFile, Segments));
+                _dialogBuilder.BuildDialog<UploadClipViewModel>(new UploadData(_currentFile, Timelines));
         }
 
         public async void GoToNextFrame()

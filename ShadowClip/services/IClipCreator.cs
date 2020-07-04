@@ -8,7 +8,7 @@ namespace ShadowClip.services
 {
     public interface IClipCreator
     {
-        Task<string> ClipAndUpload(string originalFileFullName, string clipName, IEnumerable<Segment> segments,
+        Task<string> ClipAndUpload(string originalFileFullName, string clipName, IEnumerable<SegmentCollection> timelines,
             bool useGpu, bool forceWideScreen, Destination destination, Progress<EncodeProgress> encodeProgress,
             Progress<UploadProgress> uploadProgress, CancellationToken cancelToken);
 

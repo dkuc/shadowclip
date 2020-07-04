@@ -98,10 +98,11 @@ namespace ShadowClip.services
             }
         }
 
-        public Task Encode(string originalFile, string outputFile, IEnumerable<Segment> segments,
+        public Task Encode(string originalFile, string outputFile, IEnumerable<SegmentCollection> timelines,
             bool useGpu, bool forceWideScreen, IProgress<EncodeProgress> encodeProgresss, CancellationToken cancelToken)
         {
-            var duration = segments.Sum(segment => (segment.End - segment.Start) / (double) segment.Speed);
+            var duration = timelines.Sum(segments =>
+                segments.Sum(segment => (segment.End - segment.Start) / (double) segment.Speed));
 
             return Encode(BuildFfmpegCommand(), duration, encodeProgresss, cancelToken);
 
@@ -110,32 +111,35 @@ namespace ShadowClip.services
                 var filter = "";
                 var index = 0;
                 var concat = "";
-                foreach (var segment in segments)
+                foreach (var segments in timelines)
                 {
-                    index++;
-                    var hasSpeedTransform = segment.Speed != 1;
-                    var suffix = hasSpeedTransform ? "tmp" : "";
-                    var zoom = segment.Zoom;
-                    var zoomFilter = zoom > 1 ? $",scale={zoom}*iw:-1, crop = iw / {zoom}:ih / {zoom}" : "";
-                    filter +=
-                        $"[0:v]trim=start={segment.Start}:duration={segment.End - segment.Start}, setpts=PTS-STARTPTS{zoomFilter}[video{index}{suffix}];";
-                    filter +=
-                        $"[0:a]atrim=start={segment.Start}:duration={segment.End - segment.Start}, asetpts=PTS-STARTPTS[audio{index}{suffix}];";
-
-                    concat += $"[video{index}][audio{index}]";
-                    if (hasSpeedTransform)
+                    foreach (var segment in segments)
                     {
-                        var extraSlow = segment.Speed > 2 || segment.Speed < 0.5m;
-                        var audioSuffix = extraSlow ? "tmp2" : "";
-                        var audioSpeed = Math.Max(0.5, Math.Min(2d, (double) segment.Speed));
-                        filter += $"[video{index}tmp]setpts=PTS/{segment.Speed}[video{index}];";
-                        filter += $"[audio{index}tmp]atempo={audioSpeed}[audio{index}{audioSuffix}];";
-                        if (extraSlow)
-                            filter += $"[audio{index}tmp2]atempo={audioSpeed}[audio{index}];";
+                        index++;
+                        var hasSpeedTransform = segment.Speed != 1;
+                        var suffix = hasSpeedTransform ? "tmp" : "";
+                        var zoom = segment.Zoom;
+                        var zoomFilter = zoom > 1 ? $",scale={zoom}*iw:-1, crop = iw / {zoom}:ih / {zoom}" : "";
+                        filter +=
+                            $"[0:v]trim=start={segment.Start}:duration={segment.End - segment.Start}, setpts=PTS-STARTPTS{zoomFilter}[video{index}{suffix}];";
+                        filter +=
+                            $"[0:a]atrim=start={segment.Start}:duration={segment.End - segment.Start}, asetpts=PTS-STARTPTS[audio{index}{suffix}];";
+
+                        concat += $"[video{index}][audio{index}]";
+                        if (hasSpeedTransform)
+                        {
+                            var extraSlow = segment.Speed > 2 || segment.Speed < 0.5m;
+                            var audioSuffix = extraSlow ? "tmp2" : "";
+                            var audioSpeed = Math.Max(0.5, Math.Min(2d, (double) segment.Speed));
+                            filter += $"[video{index}tmp]setpts=PTS/{segment.Speed}[video{index}];";
+                            filter += $"[audio{index}tmp]atempo={audioSpeed}[audio{index}{audioSuffix}];";
+                            if (extraSlow)
+                                filter += $"[audio{index}tmp2]atempo={audioSpeed}[audio{index}];";
+                        }
                     }
                 }
 
-                concat += $"concat=n={segments.Count()}:v=1:a=1";
+                concat += $"concat=n={timelines.Sum(segments => segments.Count())}:v=1:a=1";
                 if (forceWideScreen)
                 {
                     concat += "[temp];[temp] setdar=16/9";

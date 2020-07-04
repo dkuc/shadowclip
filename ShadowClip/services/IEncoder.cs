@@ -8,7 +8,7 @@ namespace ShadowClip.services
 {
     public interface IEncoder
     {
-        Task Encode(string originalFile, string outputFile, IEnumerable<Segment> segments, bool useGpu, bool forceWideScreen,
+        Task Encode(string originalFile, string outputFile, IEnumerable<SegmentCollection> segments, bool useGpu, bool forceWideScreen,
             IProgress<EncodeProgress> encodeProgress, CancellationToken cancelToken);
 
         Task Encode(IReadOnlyList<FileInfo> clips, string outputFile, bool useGpu, bool forceWideScreen,

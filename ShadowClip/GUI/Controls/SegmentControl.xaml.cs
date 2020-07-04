@@ -72,7 +72,7 @@ namespace ShadowClip.GUI.Controls
             var border = new Border
             {
                 //Background = new SolidColorBrush(Colors.LightGreen),
-                Child = new TextBlock {Text = "Preview"}
+                Child = new NoSizeDecorator{Child = new TextBlock {Text = "Preview"}}
             };
 
             var myBinding = new Binding
@@ -224,5 +224,13 @@ namespace ShadowClip.GUI.Controls
         }
 
         public Segment Segment { get; }
+    }
+    public class NoSizeDecorator : Decorator
+    {
+        protected override Size MeasureOverride(Size constraint) {
+            // Ask for no space
+            Child.Measure(new Size(0,0));
+            return new Size(0, 0);
+        }        
     }
 }

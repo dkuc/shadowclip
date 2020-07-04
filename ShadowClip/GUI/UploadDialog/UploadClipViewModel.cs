@@ -16,10 +16,10 @@ namespace ShadowClip.GUI.UploadDialog
     {
         public IEnumerable<VideoFile> VideoFiles { get; }
 
-        public UploadData(FileInfo originalFile, BindableCollection<Segment> segments)
+        public UploadData(FileInfo originalFile, BindableCollection<SegmentCollection> timelines)
         {
             OriginalFile = originalFile;
-            Segments = segments;
+            Timelines = timelines;
             IsMultiClip = false;
         }
         
@@ -31,7 +31,7 @@ namespace ShadowClip.GUI.UploadDialog
 
         public bool IsMultiClip { get; }
 
-        public BindableCollection<Segment> Segments { get; }
+        public BindableCollection<SegmentCollection> Timelines { get; }
 
         public FileInfo OriginalFile { get; }
     }
@@ -72,7 +72,7 @@ namespace ShadowClip.GUI.UploadDialog
             _eventAggregator = eventAggregator;
             _apiClient = apiClient;
             OriginalFile = data.OriginalFile;
-            Segments = data.IsMultiClip ? new BindableCollection<Segment> {new Segment()} : data.Segments;
+            Timelines = data.Timelines;
             IsMultiClip = data.IsMultiClip;
             VideoFiles = data.IsMultiClip ? new BindableCollection<VideoFile>(data.VideoFiles) : null;
             FileName = "";
@@ -83,11 +83,11 @@ namespace ShadowClip.GUI.UploadDialog
 
         public bool IsMultiClip { get; }
 
-        public BindableCollection<Segment> Segments { get; }
+        public BindableCollection<SegmentCollection> Timelines { get; }
 
-        public decimal Speed => Segments.First().Speed;
+        public decimal Speed => Timelines.First().First().Speed;
 
-        public int Zoom => Segments.First().Zoom;
+        public int Zoom => Timelines.First().First().Zoom;
 
         public State CurrentState { get; set; }
 
@@ -102,8 +102,8 @@ namespace ShadowClip.GUI.UploadDialog
                 .Concat(new[] {' '})
                 .ToArray()));
 
-        public double StartTime => Segments.First().Start;
-        public double EndTime => Segments.Last().End;
+        public double StartTime => Timelines.First().First().Start;
+        public double EndTime => Timelines.First().Last().End;
 
         public bool CurrentlyUploading { get; set; }
         public bool CurrentlyEncoding { get; set; }
@@ -212,7 +212,7 @@ namespace ShadowClip.GUI.UploadDialog
                         uploadProgress, _cancelToken.Token);
                 else
                     YouTubeId = await _clipCreator.ClipAndUpload(OriginalFile.FullName, $"{SafeFileName}.mp4",
-                        Segments,
+                        Timelines,
                         UseFfmpeg,
                         ForceWideScreen,
                         SelectedDestination,
