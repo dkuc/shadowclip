@@ -60,8 +60,12 @@ namespace ShadowClip.GUI
         }
 
         public bool IsMuted { get; set; }
-
-        public bool IsSoftware { get; set; }
+        
+        public double Volume
+        {
+            get => _settings.Volume;
+            set => _settings.Volume = value;
+        }
 
         public MediaElement VideoPlayer => _videoView.Video;
 
@@ -198,15 +202,6 @@ namespace ShadowClip.GUI
         public void OnIsMutedChanged()
         {
             _settings.IsMuted = IsMuted;
-        }
-
-        public void OnIsSoftwareChanged()
-        {
-            if(IsSoftware)
-                ShellView.EnableSoftwareRender();
-            else
-                ShellView.EnableDefaultRender();
-
         }
 
         private void SetVideoSpeed(decimal speed)

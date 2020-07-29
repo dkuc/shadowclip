@@ -10,11 +10,10 @@
              mc:Ignorable="d"
              d:DesignHeight="300" d:DesignWidth="700">
     <UserControl.Resources>
-        <gui:MaxLengthConverter x:Key="MaxLength" />
         <gui:PlayActionCoverter x:Key="PlayActionCoverter" />
-        <gui:IntegerSecondsConverter x:Key="IntegerSecondsConverter" />
         <gui:VideoZoomConverter x:Key="VideoZoomConverter" />
         <gui:TimeSpanToSecondsConverter x:Key="TimeSpanToSecondsConverter" />
+        <gui:DoubleToPercentageConverter x:Key="DoubleToPercentageConverter" />
     </UserControl.Resources>
     <Grid cal:Message.Attach="[Event PreviewKeyDown] = [Action KeyPressed($eventArgs)]">
         <Grid.RowDefinitions>
@@ -31,6 +30,7 @@
                                Height="{Binding ElementName=VideoCanvas, Path=ActualHeight}"
                                Width="{Binding ElementName=VideoCanvas, Path=ActualWidth}"
                                IsMuted="{Binding IsMuted, Mode=TwoWay}"
+                               Volume="{Binding Volume, Mode=TwoWay}"
                                cal:Message.Attach="[Event MouseDown] = [Action VideoClicked($eventArgs)];">
 
                 <ffme:MediaElement.RenderTransform>
@@ -150,9 +150,11 @@
                         <Button Content="Create GIF" Name="MakeGif"
                                 ToolTip="Creates an animated GIF based on the current frame and the one that immediately follows it" />
                     </StackPanel>
-                    <CheckBox Content="Software Render" IsChecked="{Binding IsSoftware}" HorizontalAlignment="Right"
-                              VerticalAlignment="Bottom"
-                              ToolTip="Turn off hardware acceleration. May reduce video playbook issues." />
+                    <StackPanel HorizontalAlignment="Right" Orientation="Horizontal">
+                        <TextBlock >Volume</TextBlock>
+                        <Slider Width="150" Minimum="0.0" Maximum="1.0" Value="{Binding ElementName=Video, Path=Volume}" VerticalAlignment="Bottom" />
+                        <TextBlock Width="30" Text="{Binding ElementName=Video, Path=Volume, Mode=OneWay, Converter={StaticResource DoubleToPercentageConverter}}" />
+                    </StackPanel>
                 </Grid>
             </StackPanel>
 

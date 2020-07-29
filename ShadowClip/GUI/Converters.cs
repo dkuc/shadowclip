@@ -112,6 +112,15 @@ namespace ShadowClip.GUI
             }
         }
     }
+    
+    internal class DoubleToPercentageConverter : SimpleConverter<double>
+    {
+        public override object Convert(double percent)
+        {
+            var percentString = percent.ToString("#0.%");
+            return $"{percentString,4}";
+        }
+    }
 
     internal class NameStateBackgroundConverter : SimpleConverter<NameState>
     {
@@ -167,27 +176,11 @@ namespace ShadowClip.GUI
         }
     }
 
-    internal class MaxLengthConverter : SimpleConverter<TimeSpan>
-    {
-        public override object Convert(TimeSpan duration)
-        {
-            return duration.TotalSeconds;
-        }
-    }
-
     internal class DestinationToVisibilityConverter : SimpleConverter<Destination>
     {
         public override object Convert(Destination duration)
         {
             return duration == Destination.File ? Visibility.Collapsed : Visibility.Visible;
-        }
-    }
-
-    internal class IntegerSecondsConverter : SimpleConverter<TimeSpan>
-    {
-        public override object Convert(TimeSpan time)
-        {
-            return time.ToString("m\\:ss\\.ff");
         }
     }
 

@@ -66,6 +66,12 @@ namespace ShadowClip.GUI
             get => _settings.IsMuted;
             set => _settings.IsMuted = value;
         }
+        
+        public double Volume
+        {
+            get => _settings.Volume;
+            set => _settings.Volume = value;
+        }
 
         public void Save()
         {
@@ -98,6 +104,7 @@ namespace ShadowClip.GUI
     public interface ISettings
     {
         bool IsMuted { get; set; }
+        double Volume { get; set; }
         string ShadowplayPath { get; set; }
         bool ShowFileNames { get; set; }
         bool ShowPreviews { get; set; }
