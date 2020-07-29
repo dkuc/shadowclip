@@ -24,7 +24,7 @@
         <Canvas ClipToBounds="True" Name="VideoCanvas">
             <ffme:MediaElement Name="Video"
                                MinWidth="300"
-                               ScrubbingEnabled="True"
+                               ScrubbingEnabled="False"
                                LoadedBehavior="Manual"
                                ClipToBounds="True"
                                Background="Transparent"
