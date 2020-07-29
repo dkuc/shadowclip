@@ -222,7 +222,11 @@ namespace ShadowClip.GUI
 
         private void VideoPlayerOnMediaOpened(object sender, MediaOpenedEventArgs mediaOpenedEventArgs)
         {
-            Segments.RemoveRange(Segments.Except(new[] {FirstSegment}).ToList());
+            if (Segments.Count == 1 && Timelines.Count == 1)
+            {
+                FirstSegment.End = Duration.TotalSeconds * 0.9;
+                FirstSegment.Start = Duration.TotalSeconds * 0.6;
+            }
             CurrentPosition = 0;
         }
 
