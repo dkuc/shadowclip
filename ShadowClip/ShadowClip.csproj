@@ -116,6 +116,7 @@
       <DependentUpon>ShellView.xaml</DependentUpon>
     </Compile>
     <Compile Include="GUI\VideoFile.cs" />
+    <Compile Include="services\FileDeleter.cs" />
     <Compile Include="services\GifCreator.cs" />
     <Compile Include="services\JsonWebApiClient.cs" />
     <Compile Include="services\ThumbnailGenerator.cs" />

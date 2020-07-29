@@ -13,19 +13,4 @@ namespace ShadowClip.GUI
 
         public FileInfo File { get; }
     }
-
-    public class RequestFileDelete
-    {
-        public RequestFileDelete(FileInfo file)
-        {
-            Files = new[] {file}; 
-        }
-
-        public RequestFileDelete(IEnumerable<FileInfo> files)
-        {
-            Files = files;
-        }
-
-        public IEnumerable<FileInfo> Files { get; }
-    }
 }

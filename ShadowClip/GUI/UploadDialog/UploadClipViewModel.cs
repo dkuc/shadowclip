@@ -56,6 +56,7 @@ namespace ShadowClip.GUI.UploadDialog
     public sealed class UploadClipViewModel : Screen
     {
         private readonly IJsonWebApiClient _apiClient;
+        private readonly IFileDeleter _fileDeleter;
         private readonly IClipCreator _clipCreator;
         private readonly IEventAggregator _eventAggregator;
         private readonly ISettings _settings;
@@ -65,12 +66,14 @@ namespace ShadowClip.GUI.UploadDialog
             ISettings settings,
             IEventAggregator eventAggregator,
             IJsonWebApiClient apiClient,
+            IFileDeleter fileDeleter,
             UploadData data)
         {
             _clipCreator = clipCreator;
             _settings = settings;
             _eventAggregator = eventAggregator;
             _apiClient = apiClient;
+            _fileDeleter = fileDeleter;
             OriginalFile = data.OriginalFile;
             Timelines = data.Timelines;
             IsMultiClip = data.IsMultiClip;
@@ -218,13 +221,15 @@ namespace ShadowClip.GUI.UploadDialog
                         SelectedDestination,
                         encodeProgress,
                         uploadProgress, _cancelToken.Token);
-                    
+
 
                 CurrentState = State.Done;
-                if (DeleteOnSuccess)
-                    _eventAggregator.PublishOnCurrentThread(IsMultiClip
-                        ? new RequestFileDelete(VideoFiles.Select(vf => vf.File))
-                        : new RequestFileDelete(OriginalFile));
+                if (!DeleteOnSuccess) return;
+                if (!IsMultiClip)
+                    await _fileDeleter.Delete(OriginalFile);
+                else
+                    foreach (var video in VideoFiles)
+                        await _fileDeleter.Delete(video.File);
             }
             catch (Exception e)
             {

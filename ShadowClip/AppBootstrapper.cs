@@ -34,6 +34,7 @@ namespace ShadowClip
                 Singleton<IWindowManager, WindowManager>();
                 Singleton<IEventAggregator, EventAggregator>();
                 Singleton<ISettings, Settings>();
+                Singleton<IFileDeleter, FileDeleter>();
                 PerResolve<IEncoder, FfmpegEncoder>();
             }
         }

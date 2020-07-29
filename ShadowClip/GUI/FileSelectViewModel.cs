@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows.Data;
 using System.Windows.Forms;
 using Caliburn.Micro;
@@ -14,22 +15,24 @@ using Screen = Caliburn.Micro.Screen;
 
 namespace ShadowClip.GUI
 {
-    public sealed class FileSelectViewModel : Screen, IHandle<RequestFileDelete>
+    public sealed class FileSelectViewModel : Screen
     {
         private readonly IEventAggregator _eventAggregator;
         private readonly ISettings _settings;
         private readonly IThumbnailGenerator _thumbnailGenerator;
         private readonly IDialogBuilder _dialogBuilder;
+        private readonly IFileDeleter _fileDeleter;
         private readonly BindableCollection<VideoFile> _videos = new BindableCollection<VideoFile>();
         private readonly List<FileSystemWatcher> _watchers = new List<FileSystemWatcher>();
 
         public FileSelectViewModel(EventAggregator eventAggregator, ISettings settings,
-            IThumbnailGenerator thumbnailGenerator, IDialogBuilder dialogBuilder)
+            IThumbnailGenerator thumbnailGenerator, IDialogBuilder dialogBuilder, IFileDeleter fileDeleter)
         {
             _eventAggregator = eventAggregator;
             _settings = settings;
             _thumbnailGenerator = thumbnailGenerator;
             _dialogBuilder = dialogBuilder;
+            _fileDeleter = fileDeleter;
             Path = _settings.ShadowplayPath;
             Videos = CollectionViewSource.GetDefaultView(_videos);
             Videos.SortDescriptions.Add(new SortDescription("CreationTime", ListSortDirection.Descending));
@@ -60,23 +63,7 @@ namespace ShadowClip.GUI
         public VideoFile SelectedVideo { get; set; }
 
         public string ErrorMessage { get; set; }
-
-        public void Handle(RequestFileDelete message)
-        {
-            try
-            {
-                foreach (var file in message.Files)
-                {
-                    DeleteAndUnselect(_videos.First(vid => vid.File.FullName == file.FullName));
-                }
-                
-            }
-            catch
-            {
-                // ignored
-            }
-        }
-
+        
         protected override void OnViewLoaded(object view)
         {
             if (string.IsNullOrEmpty(Path))
@@ -185,7 +172,7 @@ namespace ShadowClip.GUI
             }
         }
 
-        public void DeleteSingle(VideoFile video)
+        public async void DeleteSingle(VideoFile video)
         {
             try
             {
@@ -193,14 +180,14 @@ namespace ShadowClip.GUI
                     "Delete Files",
                     MessageBoxButtons.OKCancel);
                 if (dialogResult == DialogResult.OK)
-                    DeleteAndUnselect(video);
+                    await DeleteAndUnselect(video);
             }
             catch (Exception e)
             {
                 MessageBox.Show("It didn't work: " + e.Message);
             }
         }
-        public void Delete()
+        public async void Delete()
         {
             try
             {
@@ -209,7 +196,7 @@ namespace ShadowClip.GUI
                     MessageBoxButtons.OKCancel);
                 if (dialogResult == DialogResult.OK)
                     foreach (var selectedFile in _videos.Where(video => video.IsSelected).ToList())
-                        DeleteAndUnselect(selectedFile);
+                        await DeleteAndUnselect(selectedFile);
             }
             catch (Exception e)
             {
@@ -228,12 +215,11 @@ namespace ShadowClip.GUI
             _dialogBuilder.BuildDialog<UploadClipViewModel>(new UploadData(videoFiles));
         }
 
-        private void DeleteAndUnselect(VideoFile video)
+        private async Task DeleteAndUnselect(VideoFile video)
         {
             if (video == SelectedVideo)
                 SelectedVideo = null;
-
-            video.File.Delete();
+            await _fileDeleter.Delete(video.File);
             _videos.Remove(video);
         }
     }

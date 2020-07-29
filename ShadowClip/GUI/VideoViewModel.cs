@@ -27,13 +27,14 @@ namespace ShadowClip.GUI
         private Segment _previewSegment;
 
         public VideoViewModel(IEventAggregator eventAggregator, ISettings settings, IDialogBuilder dialogBuilder,
-            GifCreator gifCreator)
+            GifCreator gifCreator, IFileDeleter fileDeleter)
         {
             _settings = settings;
             _dialogBuilder = dialogBuilder;
             _gifCreator = gifCreator;
             eventAggregator.Subscribe(this);
             AddTimeline();
+            fileDeleter.OnDelete(OnFileDelete);
         }
 
         public SegmentCollection Segments => SelectedTimeline ?? Timelines.First();
@@ -102,13 +103,23 @@ namespace ShadowClip.GUI
             set => Position = value.ToTimeSpan();
         }
 
+        private async Task OnFileDelete(FileInfo file)
+        {
+            if (VideoPlayer.Source?.OriginalString == file.FullName)
+            {
+                await VideoPlayer.Close();
+                // The above Close function is buggy and the file is not closed by the
+                // time the task completes. This gives it an extra half second to close the file.
+                await Task.Delay(500);
+            }
+        }
+
         public async void Handle(FileSelected message)
         {
             _currentFile = message.File;
             if (message.File == null)
             {
-                //Block so delete happens after close
-                VideoPlayer.Close().GetAwaiter().GetResult();
+                await VideoPlayer.Close();
                 return;
             }
 
