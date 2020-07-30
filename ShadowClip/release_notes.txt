@@ -1,4 +1,7 @@
-﻿* Added ability to craft multiple timelines
+﻿* Added volume bar
+* Fixed application hang on delete
+* Smoother video scrubbing
+* Added ability to craft multiple timelines
 * Add delete button to each video row
 * Fix in use delete bug 
 * Increase GPU encode quality (6Mbps -> 15 Mbps)
