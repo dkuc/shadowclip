@@ -21,6 +21,8 @@ namespace ShadowClip.services
         public async Task Generate(FileInfo file)
         {
             Directory.CreateDirectory(_thumbnailPath);
+            
+            await Task.Delay( 500); // wait for new file to fully write to disk
 
             _previousCall = _previousCall == null ? CreateThumbnail(file) : CreateThumbnailDeferred(file);
 
