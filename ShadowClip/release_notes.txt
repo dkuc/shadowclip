@@ -1,4 +1,5 @@
-﻿* Added volume bar
+﻿* Fix clip slider bars getting stuck
+* Added volume bar
 * Fixed application hang on delete
 * Smoother video scrubbing
 * Added ability to craft multiple timelines
