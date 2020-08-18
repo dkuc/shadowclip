@@ -224,8 +224,9 @@ namespace ShadowClip.GUI
         {
             if (Segments.Count == 1 && Timelines.Count == 1)
             {
-                FirstSegment.End = Duration.TotalSeconds * 0.9;
-                FirstSegment.Start = Duration.TotalSeconds * 0.6;
+                FirstSegment.Start = 0; // Prevents a crash when End is set to a value smaller than Start
+                FirstSegment.End = Duration.TotalSeconds;
+                FirstSegment.Start = Duration.TotalSeconds * 0.7;
             }
             CurrentPosition = 0;
         }
