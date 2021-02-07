@@ -204,6 +204,12 @@ namespace ShadowClip.GUI
             }
         }
 
+        public async void RefreshList()
+        {
+            _videos.Clear();
+            await Task.Delay(100); //To give a visual cue that the list is actually refreshing
+            LoadPath();
+        }
         public void CombineClips()
         {
             var videoFiles = _videos.Where(video => video.IsSelected);

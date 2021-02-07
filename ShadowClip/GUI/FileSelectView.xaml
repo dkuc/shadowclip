@@ -67,6 +67,7 @@
         </ListBox>
         <TextBlock Grid.Row="2" Text="{Binding ErrorMessage}" VerticalAlignment="Center" HorizontalAlignment="Center" />
         <StackPanel Grid.Row="3" Orientation="Horizontal">
+            <Button Name="RefreshList" Content="Refresh List"/>
             <Button Name="CombineClips" Content="Combine Selected"/>
             <Button Name="Delete" Content="Delete Selected" />
         </StackPanel>
