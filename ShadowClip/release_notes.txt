@@ -1,4 +1,7 @@
-﻿* Fix clip slider bars getting stuck
+﻿* Added copy encoder.  Highest Quality/Highest File Size
+* Refresh File List button
+* Crash Report Dialog
+* Fix clip slider bars getting stuck
 * Added volume bar
 * Fixed application hang on delete
 * Smoother video scrubbing
