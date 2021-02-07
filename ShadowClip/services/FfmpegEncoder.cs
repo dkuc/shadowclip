@@ -99,8 +99,22 @@ namespace ShadowClip.services
         }
 
         public Task Encode(string originalFile, string outputFile, IEnumerable<SegmentCollection> timelines,
-            bool useGpu, bool forceWideScreen, IProgress<EncodeProgress> encodeProgresss, CancellationToken cancelToken)
+            Encoder encoder, bool forceWideScreen, IProgress<EncodeProgress> encodeProgresss, CancellationToken cancelToken)
         {
+            var firstSegment = timelines.First().First();
+            if (encoder == Encoder.COPY)
+            {
+                if(timelines.Count() > 1)
+                    throw new ArgumentException("Cannot use COPY encode with multiple time lines");
+                if(timelines.First().Count > 1)
+                    throw new ArgumentException("Cannot use COPY encode with multiple segments");
+                if(firstSegment.Zoom != 1)
+                    throw new ArgumentException("Cannot use COPY encode with zoom");
+                if(firstSegment.Speed != 1)
+                    throw new ArgumentException("Cannot use COPY encode with speed change");
+                
+            }
+                
             var duration = timelines.Sum(segments =>
                 segments.Sum(segment => (segment.End - segment.Start) / (double) segment.Speed));
 
@@ -148,18 +162,26 @@ namespace ShadowClip.services
                 concat += "[final]";
                 filter += concat;
 
-                var encoder = useGpu ? "h264_nvenc" : "libx264 ";
+                var encoderString = encoder == Encoder.GPU ? "h264_nvenc -qp 35" : encoder == Encoder.CPU ? "libx264 -crf 25" : "copy";
+                
+                var map = encoder != Encoder.COPY ? "-map [final]" : "";
+
+                var transform = encoder != Encoder.COPY ? $"-filter_complex \"{filter}\"" : $"-ss {firstSegment.Start} -t {firstSegment.End - firstSegment.Start}";
+
                 var command =
-                    $"-nostdin -i \"{originalFile}\" -c:v {encoder} -filter_complex \"{filter}\"  -global_quality:v 25 -movflags faststart -f mp4 -y -map [final] \"{outputFile}\"";
+                    $"-nostdin -i \"{originalFile}\" -c:v {encoderString} {transform}  -movflags faststart -f mp4 -y {map} \"{outputFile}\"";
                 Console.WriteLine(command);
                 return command;
             }
         }
 
-        public async Task Encode(IReadOnlyList<FileInfo> clips, string outputFile, bool useGpu, bool forceWideScreen,
+        public async Task Encode(IReadOnlyList<FileInfo> clips, string outputFile, Encoder encoder, bool forceWideScreen,
             Progress<EncodeProgress> encodeProgress,
             CancellationToken cancelToken)
         {
+            if (encoder == Encoder.COPY)
+                throw new ArgumentException("Cannot use COPY encode when combining video files.");
+            
             var duration = await GetFullDuration(clips);
 
             await Encode(BuildFfmpegCommand(), duration, encodeProgress, cancelToken);
@@ -174,10 +196,10 @@ namespace ShadowClip.services
                 }
 
                 filter += "[final]";
-                var encoder = useGpu ? "h264_nvenc" : "libx264 ";
+                var encoderString = encoder == Encoder.GPU ? "h264_nvenc -qp 35" : "libx264 -crf 25";
                 var inputFiles = string.Join(" ", clips.Select(file => $"-i \"{file.FullName}\""));
                 var command =
-                    $"-nostdin {inputFiles} -c:v {encoder} -filter_complex \"{filter}\"  -global_quality:v 33 -movflags faststart -f mp4 -y -map [final] \"{outputFile}\"";
+                    $"-nostdin {inputFiles} -c:v {encoderString} -filter_complex \"{filter}\"   -movflags faststart -f mp4 -y -map [final] \"{outputFile}\"";
                 Console.WriteLine(command);
                 return command;
             }

@@ -6,12 +6,19 @@ using System.Threading.Tasks;
 
 namespace ShadowClip.services
 {
+    public enum Encoder
+    {
+        CPU,
+        GPU,
+        COPY
+    }
+
     public interface IEncoder
     {
-        Task Encode(string originalFile, string outputFile, IEnumerable<SegmentCollection> segments, bool useGpu, bool forceWideScreen,
+        Task Encode(string originalFile, string outputFile, IEnumerable<SegmentCollection> segments, Encoder encoder, bool forceWideScreen,
             IProgress<EncodeProgress> encodeProgress, CancellationToken cancelToken);
 
-        Task Encode(IReadOnlyList<FileInfo> clips, string outputFile, bool useGpu, bool forceWideScreen,
+        Task Encode(IReadOnlyList<FileInfo> clips, string outputFile, Encoder encoder, bool forceWideScreen,
             Progress<EncodeProgress> encodeProgress, CancellationToken cancelToken);
     }
 

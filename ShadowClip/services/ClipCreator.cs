@@ -30,19 +30,19 @@ namespace ShadowClip.services
         }
 
         public Task<string> ClipAndUpload(string originalFile, string clipName, IEnumerable<SegmentCollection> timelines,
-            bool useGpu, bool forceWideScreen, Destination destination, Progress<EncodeProgress> encodeProgress,
+            Encoder encoder, bool forceWideScreen, Destination destination, Progress<EncodeProgress> encodeProgress,
             Progress<UploadProgress> uploadProgress,
             CancellationToken cancelToken)
         {
-            Task EncodeAction(string outputFile) => _encoder.Encode(originalFile, outputFile, timelines, useGpu, forceWideScreen, encodeProgress, cancelToken);
+            Task EncodeAction(string outputFile) => _encoder.Encode(originalFile, outputFile, timelines, encoder, forceWideScreen, encodeProgress, cancelToken);
             return ClipAndUpload(EncodeAction, clipName, destination, uploadProgress, cancelToken);
         }
 
-        public Task<string> ClipAndUpload(IReadOnlyList<FileInfo> clips, string clipName, bool useGpu, bool forceWideScreen,
+        public Task<string> ClipAndUpload(IReadOnlyList<FileInfo> clips, string clipName, Encoder encoder, bool forceWideScreen,
             Destination destination, Progress<EncodeProgress> encodeProgress,
             Progress<UploadProgress> uploadProgress, CancellationToken cancelToken)
         {
-            Task EncodeAction(string outputFile) => _encoder.Encode(clips, outputFile, useGpu, forceWideScreen, encodeProgress, cancelToken);
+            Task EncodeAction(string outputFile) => _encoder.Encode(clips, outputFile, encoder, forceWideScreen, encodeProgress, cancelToken);
             return ClipAndUpload(EncodeAction, clipName, destination, uploadProgress, cancelToken);
         }
 

@@ -79,10 +79,8 @@
             </StackPanel>
             <StackPanel Orientation="Horizontal">
                 <TextBlock Text="Encoder: " />
-                <RadioButton Content="CPU " IsChecked="True"
-                             IsEnabled="{Binding CurrentState,Converter={StaticResource StateToBoolConverter},ConverterParameter='ready,error'}" />
-                <RadioButton Content="GPU" IsChecked="{Binding UseFfmpeg}"
-                             IsEnabled="{Binding CurrentState,Converter={StaticResource StateToBoolConverter},ConverterParameter='ready,error'}" />
+                <ComboBox ItemsSource="{Binding Encoders}" SelectedValue="{Binding SelectedEncoder}"
+                          IsEnabled="{Binding CurrentState,Converter={StaticResource StateToBoolConverter},ConverterParameter='ready,error'}" />
                 <CheckBox Name="ForceWideScreen" Content="Force 16:9 AR" Margin="16, 0"
                           IsEnabled="{Binding CurrentState,Converter={StaticResource StateToBoolConverter},ConverterParameter='ready,error'}"
                           ToolTip="Force the output video to be in 16:9 aspect ratio to eliminate black bars."/>

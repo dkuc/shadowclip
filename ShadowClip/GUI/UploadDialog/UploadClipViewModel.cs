@@ -117,7 +117,6 @@ namespace ShadowClip.GUI.UploadDialog
         public int UploadRate { get; set; }
         public bool OperationInProgress { get; set; }
         public bool DeleteOnSuccess { get; set; }
-        public bool UseFfmpeg { get; set; }
         public bool ForceWideScreen { get; set; }
 
         public string ErrorText { get; set; }
@@ -127,6 +126,8 @@ namespace ShadowClip.GUI.UploadDialog
 
         public Destination SelectedDestination { get; set; }
         public Array Destinations => Enum.GetValues(typeof(Destination));
+        public Encoder SelectedEncoder { get; set; }
+        public Array Encoders => Enum.GetValues(typeof(Encoder));
 
         public async void OnSafeFileNameChanged()
         {
@@ -208,7 +209,7 @@ namespace ShadowClip.GUI.UploadDialog
                 if (IsMultiClip)
                     YouTubeId = await _clipCreator.ClipAndUpload(VideoFiles.Select(vf => vf.File).ToList(),
                         $"{SafeFileName}.mp4",
-                        UseFfmpeg,
+                        SelectedEncoder,
                         ForceWideScreen,
                         SelectedDestination,
                         encodeProgress,
@@ -216,7 +217,7 @@ namespace ShadowClip.GUI.UploadDialog
                 else
                     YouTubeId = await _clipCreator.ClipAndUpload(OriginalFile.FullName, $"{SafeFileName}.mp4",
                         Timelines,
-                        UseFfmpeg,
+                        SelectedEncoder,
                         ForceWideScreen,
                         SelectedDestination,
                         encodeProgress,
@@ -274,14 +275,14 @@ namespace ShadowClip.GUI.UploadDialog
 
         protected override void OnActivate()
         {
-            UseFfmpeg = _settings.UseFfmpeg;
+            SelectedEncoder = _settings.Encoder;
             ForceWideScreen = _settings.ForceWideScreen;
             SelectedDestination = _settings.Destination;
         }
 
-        public void OnUseFfmpegChanged()
+        public void OnEncoderChanged()
         {
-            _settings.UseFfmpeg = UseFfmpeg;
+            _settings.Encoder = SelectedEncoder;
         }
 
         public void OnForceWideScreenChanged()

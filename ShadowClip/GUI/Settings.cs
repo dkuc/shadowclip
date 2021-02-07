@@ -78,10 +78,14 @@ namespace ShadowClip.GUI
             _settings.Save();
         }
 
-        public bool UseFfmpeg
+        public Encoder Encoder
         {
-            get => _settings.UseFfmpeg;
-            set => _settings.UseFfmpeg = value;
+            get
+            {
+                Enum.TryParse(_settings.Encoder, out Encoder encoder);
+                return encoder;
+            }
+            set => _settings.Encoder = value.ToString();
         }
 
         public bool ForceWideScreen
@@ -114,7 +118,7 @@ namespace ShadowClip.GUI
         double Height { get; set; }
         double Left { get; set; }
         double Top { get; set; }
-        bool UseFfmpeg { get; set; }
+        Encoder Encoder { get; set; }
         bool ForceWideScreen { get; set; }
         Destination Destination { get; set; }
         void Save();
