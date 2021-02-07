@@ -147,7 +147,7 @@ namespace ShadowClip.GUI
             }
         }
 
-        public void Rename(VideoFile video)
+        public async void Rename(VideoFile video)
         {
             var renameDialog = new RenameDialog
             {
@@ -159,8 +159,11 @@ namespace ShadowClip.GUI
             if (dialogResult != null && dialogResult.Value)
             {
                 if (video == SelectedVideo)
+                {
                     SelectedVideo = null;
-
+                    await Task.Delay(500); //Give time for the video to close
+                }
+                
                 var directory = GetDirectoryName(video.File.FullName);
 
                 if (directory == null)
