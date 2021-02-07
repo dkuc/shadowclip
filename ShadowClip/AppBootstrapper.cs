@@ -17,6 +17,12 @@ namespace ShadowClip
         public AppBootstrapper()
         {
             Library.FFmpegDirectory = "ffmpeg_binaries";
+            AppDomain.CurrentDomain.UnhandledException += (sender, args) =>
+            {
+                MessageBox.Show(args.ExceptionObject.ToString(),
+                    "The app crashed. ctrl-c this window and send it to the developers.", MessageBoxButton.OK,
+                    MessageBoxImage.Error);
+            };
             Initialize();
         }
 
