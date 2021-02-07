@@ -112,6 +112,8 @@ namespace ShadowClip.services
                     throw new ArgumentException("Cannot use COPY encode with zoom");
                 if(firstSegment.Speed != 1)
                     throw new ArgumentException("Cannot use COPY encode with speed change");
+                if(forceWideScreen)
+                    throw new ArgumentException("Cannot use COPY encode with 16x9 force");
                 
             }
                 
@@ -162,7 +164,7 @@ namespace ShadowClip.services
                 concat += "[final]";
                 filter += concat;
 
-                var encoderString = encoder == Encoder.GPU ? "h264_nvenc -qp 35" : encoder == Encoder.CPU ? "libx264 -crf 25" : "copy";
+                var encoderString = encoder == Encoder.GPU ? "h264_nvenc -qp 30" : encoder == Encoder.CPU ? "libx264 -crf 25" : "copy";
                 
                 var map = encoder != Encoder.COPY ? "-map [final]" : "";
 
@@ -196,7 +198,7 @@ namespace ShadowClip.services
                 }
 
                 filter += "[final]";
-                var encoderString = encoder == Encoder.GPU ? "h264_nvenc -qp 35" : "libx264 -crf 25";
+                var encoderString = encoder == Encoder.GPU ? "h264_nvenc -qp 30" : "libx264 -crf 25";
                 var inputFiles = string.Join(" ", clips.Select(file => $"-i \"{file.FullName}\""));
                 var command =
                     $"-nostdin {inputFiles} -c:v {encoderString} -filter_complex \"{filter}\"   -movflags faststart -f mp4 -y -map [final] \"{outputFile}\"";

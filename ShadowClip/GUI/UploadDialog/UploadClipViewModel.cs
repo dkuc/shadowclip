@@ -280,7 +280,7 @@ namespace ShadowClip.GUI.UploadDialog
             SelectedDestination = _settings.Destination;
         }
 
-        public void OnEncoderChanged()
+        public void OnSelectedEncoderChanged()
         {
             _settings.Encoder = SelectedEncoder;
         }
