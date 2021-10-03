@@ -1,4 +1,5 @@
-﻿* Added copy encoder.  Highest Quality/Highest File Size
+﻿* Fixed aspect ratio of screenshots
+* Added copy encoder.  Highest Quality/Highest File Size
 * Refresh File List button
 * Crash Report Dialog
 * Fix clip slider bars getting stuck
