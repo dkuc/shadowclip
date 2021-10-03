@@ -1,8 +1,11 @@
 ﻿using System;
+using System.Drawing;
+using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using MediaElement = Unosquare.FFME.MediaElement;
+using Unosquare.FFME;
 
 namespace ShadowClip.GUI
 {
@@ -10,39 +13,36 @@ namespace ShadowClip.GUI
     {
         public static TimeSpan ToTimeSpan(this double value)
         {
-            return TimeSpan.FromTicks((long) (value * 10_000_000));
+            return TimeSpan.FromTicks((long)(value * 10_000_000));
         }
-        public static BitmapSource GetScreenShot(this MediaElement source, int zoom)
+
+        public static async Task<BitmapSource> GetScreenShot(this MediaElement source, int zoom)
         {
-            var scale = source.NaturalVideoHeight / source.RenderSize.Height;
+            var result = (await source.CaptureBitmapAsync()).CreateBitmapSourceFromBitmap();
 
-            var actualHeight = source.RenderSize.Height;
-            var actualWidth = source.RenderSize.Width;
-            var renderHeight = actualHeight * scale;
-            var renderWidth = actualWidth * scale;
+            var renderHeight = (double)source.NaturalVideoHeight;
+            var renderWidth = (double)source.NaturalVideoWidth;
 
-            var renderTarget = new RenderTargetBitmap((int) renderWidth,
-                (int) renderHeight, 96, 96, PixelFormats.Pbgra32);
-            var sourceBrush = new VisualBrush(source);
-            var drawingVisual = new DrawingVisual();
-            var drawingContext = drawingVisual.RenderOpen();
-
-            using (drawingContext)
-            {
-                drawingContext.PushTransform(new ScaleTransform(scale, scale));
-                drawingContext.DrawRectangle(sourceBrush, null, new Rect(new Point(0, 0),
-                    new Point(actualWidth, actualHeight)));
-            }
-
-            renderTarget.Render(drawingVisual);
-            var zoomedBitmap = new TransformedBitmap(renderTarget, new ScaleTransform(zoom, zoom));
+            var zoomedBitmap = new TransformedBitmap(result, new ScaleTransform(zoom, zoom));
             var croppedBitmap = new CroppedBitmap(zoomedBitmap, new Int32Rect(
-                (int) (zoomedBitmap.Width / 2 - renderWidth / 2),
-                (int) (zoomedBitmap.Height / 2 - renderHeight / 2),
-                (int) renderWidth,
-                (int) renderHeight
+                (int)(zoomedBitmap.Width / 2 - renderWidth / 2),
+                (int)(zoomedBitmap.Height / 2 - renderHeight / 2),
+                (int)renderWidth,
+                (int)renderHeight
             ));
             return croppedBitmap;
+        }
+
+        public static BitmapSource CreateBitmapSourceFromBitmap(this Bitmap bitmap)
+        {
+            if (bitmap == null)
+                throw new ArgumentNullException("bitmap");
+
+            return Imaging.CreateBitmapSourceFromHBitmap(
+                bitmap.GetHbitmap(),
+                IntPtr.Zero,
+                Int32Rect.Empty,
+                BitmapSizeOptions.FromEmptyOptions());
         }
     }
 }

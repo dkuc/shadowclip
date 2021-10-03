@@ -339,17 +339,17 @@ namespace ShadowClip.GUI
 
         public async void MakeGif()
         {
-            var frame1 = VideoPlayer.GetScreenShot(Zoom);
+            var frame1 = await VideoPlayer.GetScreenShot(Zoom);
             GoToNextFrame();
             await Task.Delay(100);
-            var frame2 = VideoPlayer.GetScreenShot(Zoom);
+            var frame2 = await VideoPlayer.GetScreenShot(Zoom);
             _gifCreator.CreateGif(frame1, frame2);
 
         }
 
-        public void Screenshot()
+        public async void Screenshot()
         {
-            var screenShot = VideoPlayer.GetScreenShot(Zoom);
+            var screenShot = await VideoPlayer.GetScreenShot(Zoom);
 
             Clipboard.SetImage(screenShot);
         }
